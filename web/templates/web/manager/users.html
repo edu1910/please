@@ -1,0 +1,105 @@
+{% extends 'web/base.html' %}
+{% load staticfiles %}
+{% load l10n %}
+
+{% block styles %}
+<link href="{% static "web/bootstrap/plugins/multi-select/css/multi-select.css" %}" rel="stylesheet" />
+{% endblock styles %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="block-header">
+            <h2>VOLUNT&Aacute;RIOS</h2>
+        </div>
+    </div>
+    <div class="row clearfix">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="card">
+                <div class="body">
+                    <div id="toolbar">
+                        <button type="button" class="btn bg-deep-purple waves-effect" onclick="javascript: new_user();">NOVO VOLUNT&Aacute;RIO</button>
+                    </div>
+                    <table
+                        id="table_users"
+                        data-toolbar="#toolbar"
+                        data-toolbar-align="right"
+                        data-search-align="left"
+                        data-pagination-loop="false"
+                        data-striped="true"
+                        data-sortable="true"
+                        data-search="true"
+                        data-pagination="true"
+                        data-toggle="table"
+                        data-unique-id="id">
+                        <thead>
+                            <tr>
+                                <th data-field="name" class="col-xs-3 col-md-3">Nome</th>
+                                <th data-field="username" class="col-xs-3 col-md-3">Usu&aacute;rio</th>
+                                <th data-field="email" class="col-xs-3 col-md-3">E-mail</th>
+                                <th data-field="groups" class="col-xs-3 col-md-3">Grupos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="defaultModal" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="defaultModalLabel">NOVO VOLUNT&Aacute;RIO</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="form_user" method="POST">
+                        <div class="form-group form-float">
+                            <label for="user_name">Nome</label>
+                            <div class="form-line">
+                                <input id="user_name" name="user_name" type="text" class="form-control" placeholder="Nome do volunt&aacute;rio" required />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-6">
+                                <label for="user_username">Usu&aacute;rio</label>
+                                <div class="form-line">
+                                    <input id="user_username" name="user_username" type="text" class="form-control" placeholder="Usu&aacute;rio do volunt&aacute;rio" required />
+                                </div>
+                            </div>
+                            <div class="col-sm-6" style="text-align: center; margin-top: 32px">
+                                <input type="checkbox" id="reset_password" name="reset_password" class="filled-in chk-col-deep-purple" />
+                                <label for="reset_password">Redefinir senha</label>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <label for="user_email">E-mail</label>
+                            <div class="form-line">
+                                <input id="user_email" name="user_email" type="text" class="form-control" placeholder="Endere&ccedil;o de e-mail do volunt&aacute;rio" required />
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <label for="user_groups">Grupos</label>
+                            <select id="user_groups" name="user_groups" class="ms" multiple="multiple">
+
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="btn_delete" type="button" class="btn btn-link waves-effect pull-left" onclick="javascript: form_delete();">EXCLUIR</button>
+                    <button type="button" class="btn btn-link waves-effect" data-dismiss="modal">CANCELAR</button>
+                    <button type="button" class="btn btn-link waves-effect" onclick="javascript: form_save();">SALVAR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block script %}
+<!-- Multi Select Plugin Js -->
+<script src="{% static "web/bootstrap/plugins/multi-select/js/jquery.multi-select.js" %}"></script>
+<script src="{% static "web/bootstrap/js/pages/manager/users.js" %}"></script>
+{% endblock script %}

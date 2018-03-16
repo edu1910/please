@@ -1,0 +1,223 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <title>PLIS</title>
+
+    <!-- Favicon-->
+    <link rel="icon" href="{% static "web/bootstrap/favicon.ico" %}" type="image/x-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
+
+    <!-- Bootstrap Core Css -->
+    <link href="{% static "web/bootstrap/plugins/bootstrap/css/bootstrap.css" %}" rel="stylesheet">
+
+    <!-- Bootstrap Table -->
+    <link href="{% static "web/bootstrap/plugins/bootstrap-table/bootstrap-table.css" %}" rel="stylesheet">
+
+    <!-- Bootstrap Select -->
+    <link href="{% static "web/bootstrap/plugins/bootstrap-select/css/bootstrap-select.css" %}" rel="stylesheet">
+
+    <!-- SweetAlert Plugin Css -->
+    <link href="{% static "web/bootstrap/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet" />
+
+    <!-- Waves Effect Css -->
+    <link href="{% static "web/bootstrap/plugins/node-waves/waves.css" %}" rel="stylesheet" />
+
+    <!-- Animation Css -->
+    <link href="{% static "web/bootstrap/plugins/animate-css/animate.css" %}" rel="stylesheet" />
+
+    <!-- Custom Css -->
+    <link href="{% static "web/bootstrap/css/style.css" %}" rel="stylesheet">
+
+    <!-- AdminBSB Themes. You can choose a theme from css/themes instead of get all themes -->
+    <link href="{% static "web/bootstrap/css/themes/theme-deep-purple.css" %}" rel="stylesheet" />
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css">
+
+    {% block styles %}
+    {% endblock styles %}
+</head>
+
+<body class="theme-deep-purple">
+    <!-- Page Loader -->
+    <div class="page-loader-wrapper">
+        <div class="loader">
+            <div class="preloader">
+                <div class="spinner-layer pl-deep-purple">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                </div>
+            </div>
+            <p>Por favor, aguarde...</p>
+        </div>
+    </div>
+    <!-- #END# Page Loader -->
+    <!-- Overlay For Sidebars -->
+    <div class="overlay"></div>
+    <!-- #END# Overlay For Sidebars -->
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <div class="search-icon">
+            <i class="material-icons">search</i>
+        </div>
+        <input type="text" placeholder="START TYPING...">
+        <div class="close-search">
+            <i class="material-icons">close</i>
+        </div>
+    </div>
+    <!-- #END# Search Bar -->
+    <!-- Top Bar -->
+    <nav class="navbar">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a href="javascript:void(0);" class="bars"></a>
+                <a class="navbar-brand" href="/">PLIS - REDE DE AJUDA</a>
+            </div>
+        </div>
+    </nav>
+    <!-- #Top Bar -->
+    <section>
+        <!-- Left Sidebar -->
+        <aside id="leftsidebar" class="sidebar">
+            <!-- User Info -->
+            <div class="user-info" style="height: 80px; padding: 0px 15px 0px 15px;">
+                <div class="info-container">
+                    <div class="name" id="name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {% if user.first_name %}
+                    {{ user.get_short_name }}
+                    {% else %}
+                    {{ user.username }}
+                    {% endif %}
+                    </div>
+                    <div class="email" id="email">
+                    {{ user.email }}
+                    </div>
+                    <div class="btn-group user-helper-dropdown">
+                        <i class="material-icons" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">keyboard_arrow_down</i>
+                        <ul class="dropdown-menu pull-right">
+                            <li><a href="/page/perfil"><i class="material-icons">person</i>Perfil</a></li>
+                            <li role="seperator" class="divider"></li>
+                            <li><a href="/user/logout"><i class="material-icons">input</i>Sair</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- #User Info -->
+            <!-- Menu -->
+            <div class="menu">
+                <ul class="list">
+                    <li {% if page == 'dashboard' %}class="active"{% endif %}>
+                        <a href="/page/dashboard">
+                            <i class="material-icons">dashboard</i>
+                            <span>Painel de controle</span>
+                        </a>
+                    </li>
+                    {% if can_validate_issues %}
+                    <li {% if page == 'issues' %}class="active"{% endif %}>
+                        <a href="/page/issues">
+                            <i class="material-icons">report</i>
+                            <span>Triagem</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if can_offer_treatments %}
+                    <li {% if page == 'treatments' %}class="active"{% endif %}>
+                        <a href="/page/treatments">
+                            <i class="material-icons">forum</i>
+                            <span>Atendimento</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if is_manager %}
+                    <li class="header">COORDENADOR</li>
+                    <li {% if page == 'manager/users' %}class="active"{% endif %}>
+                        <a href="/page/manager/users">
+                            <i class="material-icons">person</i>
+                            <span>Volunt&aacute;rios</span>
+                        </a>
+                    </li>
+                    <!--li {% if page == 'manager/statistics' %}class="active"{% endif %}>
+                        <a href="/page/manager/statistics">
+                            <i class="material-icons">show_chart</i>
+                            <span>Estat&iacute;sticas</span>
+                        </a>
+                    </li-->
+                    {% endif %}
+                    {% if is_admin %}
+                    <li class="header">ADMINISTRADOR</li>
+                    <li {% if page == 'admin/groups' %}class="active"{% endif %}>
+                        <a href="/page/admin/groups">
+                            <i class="material-icons">group</i>
+                            <span>Grupos</span>
+                        </a>
+                    </li>
+                    <!--li {% if page == 'admin/settings' %}class="active"{% endif %}>
+                        <a href="/page/admin/settings">
+                            <i class="material-icons">settings</i>
+                            <span>Configura&ccedil;&otilde;es</span>
+                        </a>
+                    </li-->
+                    {% endif %}
+                </ul>
+            </div>
+            <!-- #Menu -->
+        </aside>
+        <!-- #END# Left Sidebar -->
+    </section>
+
+    {% block content %}
+    {% endblock content %}
+
+    <!-- Jquery Core Js -->
+    <script src="{% static "web/bootstrap/plugins/jquery/jquery.min.js" %}"></script>
+
+    <!-- Bootstrap Core Js -->
+    <script src="{% static "web/bootstrap/plugins/bootstrap/js/bootstrap.js" %}"></script>
+
+    <!-- Bootstrap Table Js -->
+    <script src="{% static "web/bootstrap/plugins/bootstrap-table/bootstrap-table.js" %}"></script>
+    <script src="{% static "web/bootstrap/plugins/bootstrap-table/locale/bootstrap-table-pt-BR.js" %}"></script>
+
+    <!-- Bootstrap Select Js -->
+    <script src="{% static "web/bootstrap/plugins/bootstrap-select/js/bootstrap-select.js" %}"></script>
+    <script src="{% static "web/bootstrap/plugins/bootstrap-select/js/i18n/defaults-pt_BR.js" %}"></script>
+
+    <!-- Bootstrap Notify Plugin Js -->
+    <script src="{% static "web/bootstrap/plugins/bootstrap-notify/bootstrap-notify.js" %}"></script>
+
+    <!-- SweetAlert Plugin Js -->
+    <script src="{% static "web/bootstrap/plugins/sweetalert/sweetalert.min.js" %}"></script>
+
+    <!-- Waves Effect Plugin Js -->
+    <script src="{% static "web/bootstrap/plugins/node-waves/waves.js" %}"></script>
+
+    <!-- Jquery CountTo Plugin Js -->
+    <script src="{% static "web/bootstrap/plugins/jquery-countto/jquery.countTo.js" %}"></script>
+
+    <!-- Jquery Validation Plugin Css -->
+    <script src="{% static "web/bootstrap/plugins/jquery-validation/jquery.validate.js" %}"></script>
+
+    <!-- Slimscroll Plugin Js -->
+    <script src="{% static "web/bootstrap/plugins/jquery-slimscroll/jquery.slimscroll.js" %}"></script>
+
+    <!-- Custom Js -->
+    <script src="{% static "web/bootstrap/js/admin.js" %}"></script>
+
+    {% block script %}
+    {% endblock script %}
+
+</body>
+
+</html>

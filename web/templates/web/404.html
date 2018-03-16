@@ -1,0 +1,46 @@
+﻿{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <title>404 | PLIS</title>
+    <!-- Favicon-->
+    <link rel="icon" href="{% static "web/bootstrap/favicon.ico" %}" type="image/x-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
+
+    <!-- Bootstrap Core Css -->
+    <link href="{% static "web/bootstrap/plugins/bootstrap/css/bootstrap.css" %}" rel="stylesheet">
+
+    <!-- Waves Effect Css -->
+    <link href="{% static "web/bootstrap/plugins/node-waves/waves.css" %}" rel="stylesheet" />
+
+    <!-- Custom Css -->
+    <link href="{% static "web/bootstrap/css/style.css" %}" rel="stylesheet">
+</head>
+
+<body class="four-zero-four">
+    <div class="four-zero-four-container">
+        <div class="error-code">404</div>
+        <div class="error-message">P&Aacute;GINA INEXISTENTE</div>
+        <div class="button-place">
+            <a href="/" class="btn btn-default btn-lg waves-effect">IR PARA P&Aacute;GINA INICIAL</a>
+        </div>
+    </div>
+
+    <!-- Jquery Core Js -->
+    <script src="{% static "web/bootstrap/plugins/jquery/jquery.min.js" %}"></script>
+
+    <!-- Bootstrap Core Js -->
+    <script src="{% static "web/bootstrap/plugins/bootstrap/js/bootstrap.js" %}"></script>
+
+    <!-- Waves Effect Plugin Js -->
+    <script src="{% static "web/bootstrap/plugins/node-waves/waves.js" %}"></script>
+</body>
+
+</html>

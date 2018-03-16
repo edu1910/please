@@ -1,0 +1,32 @@
+{% extends 'web/base.html' %}
+{% load staticfiles %}
+{% load l10n %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="block-header">
+            <h2>ATENDIMENTO</h2>
+        </div>
+
+        <div class="row clearfix">
+            <!-- Treatments -->
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="start_card">
+                <div class="card">
+                    <div class="body">
+                        <p style="text-align: justify">Ol&aacute;! Aqui n&oacute;s podemos fazer o atendimento das pessoas que est&atilde;o buscando nossa ajuda. Essa &eacute; uma tarefa de muita responsabilidade, pois essas pessoas podem encontrar, durante o nosso atendimento, a motiva&ccedil;&atilde;o necess&aacute;ria para continuarem vivas.</p>
+                        <p style="text-align: justify">O nosso trabalho &eacute; muito importante e se ao menos uma vida puder ser salva j&aacute; ter&aacute; valido a pena. Vamos come&ccedil;ar?</p>
+                        <p style="text-align: center; margin: 0">
+                            <button type="button" class="btn bg-deep-purple waves-effect" onclick="javascript: start_issues();">INICIAR ATENDIMENTO</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- #END# Treatments -->
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block script %}
+{% endblock script %}

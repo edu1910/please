@@ -1,0 +1,96 @@
+{% extends 'web/base.html' %}
+{% load staticfiles %}
+{% load l10n %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="block-header">
+            <h2>GRUPOS</h2>
+        </div>
+    </div>
+    <div class="row clearfix">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="card">
+                <div class="body">
+                    <div id="toolbar">
+                        <button type="button" class="btn bg-deep-purple waves-effect" onclick="javascript: new_group();">NOVO GRUPO</button>
+                    </div>
+                    <table
+                        id="table_groups"
+                        data-toolbar="#toolbar"
+                        data-toolbar-align="right"
+                        data-search-align="left"
+                        data-pagination-loop="false"
+                        data-striped="true"
+                        data-sortable="true"
+                        data-search="true"
+                        data-pagination="true"
+                        data-toggle="table"
+                        data-unique-id="id">
+                        <thead>
+                            <tr>
+                                <th data-field="name" class="col-xs-4 col-md-4">Nome</th>
+                                <th data-field="manager" class="col-xs-4 col-md-4">Coordenador</th>
+                                <th data-field="can_validate" class="col-xs-2 col-md-2">Triagem</th>
+                                <th data-field="can_treatment" class="col-xs-2 col-md-2">Atendimento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="defaultModal" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="defaultModalLabel">NOVO GRUPO</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="form_group" method="POST">
+                        <div class="form-group form-float">
+                            <label for="group_name">Nome</label>
+                            <div class="form-line">
+                                <input id="group_name" name="group_name" type="text" class="form-control" placeholder="Nome do grupo" required />
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <label for="group_manager">Coordenador</label>
+                            <select id="group_manager" name="group_manager" class="form-control">
+                                <option value="">-- Selecione o coordenador --</option>
+                            </select>
+                        </div>
+
+                        <div class="row clearfix">
+                            <div class="col-sm-6">
+                                <div class="form-group" style="text-align: center">
+                                    <input type="checkbox" id="group_can_validate" name="group_can_validate" class="filled-in chk-col-deep-purple" />
+                                    <label for="group_can_validate">Triagem</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group" style="text-align: center">
+                                    <input type="checkbox" id="group_can_treatment" name="group_can_treatment" class="filled-in chk-col-deep-purple" />
+                                    <label for="group_can_treatment">Atendimento</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="btn_delete" type="button" class="btn btn-link waves-effect pull-left" onclick="javascript: form_delete();">EXCLUIR</button>
+                    <button type="button" class="btn btn-link waves-effect" data-dismiss="modal">CANCELAR</button>
+                    <button type="button" class="btn btn-link waves-effect" onclick="javascript: form_save();">SALVAR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block script %}
+<script src="{% static "web/bootstrap/js/pages/admin/groups.js" %}"></script>
+{% endblock script %}

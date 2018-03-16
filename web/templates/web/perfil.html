@@ -1,0 +1,85 @@
+{% extends 'web/base.html' %}
+{% load staticfiles %}
+{% load l10n %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="block-header">
+            <h2>PERFIL</h2>
+        </div>
+        <div class="row clearfix">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="start_card">
+                <div class="card">
+                    <div class="header">
+                        <h2>SEUS DADOS</h2>
+                    </div>
+                    <div class="body">
+                        <p style="text-align: justify">Se for necess&aacute;rio atualizar alguma informa&ccedil;&atilde;o cadastral, fa&ccedil;a a altera&ccedil;&atilde;o no formul&aacute;rio abaixo.</p>
+                        <form id="form_user" method="POST">
+                            <div class="form-group form-float">
+                                <label for="user_name">Nome</label>
+                                <div class="form-line">
+                                    <input value="{{ user.first_name }}" id="user_name" name="user_name" type="text" class="form-control" placeholder="Seu nome" required />
+                                </div>
+                            </div>
+                            <div class="form-group form-float">
+                                <label for="user_username">Usu&aacute;rio</label>
+                                <div class="form-line">
+                                    <input value="{{ user.username }}" id="user_username" name="user_username" type="text" class="form-control" placeholder="Seu usu&aacute;rio" required />
+                                </div>
+                            </div>
+                            <div class="form-group form-float">
+                                <label for="user_email">E-mail</label>
+                                <div class="form-line">
+                                    <input value="{{ user.email }}" id="user_email" name="user_email" type="text" class="form-control" placeholder="Seu endere&ccedil;o de e-mail" required />
+                                </div>
+                            </div>
+                        </form>
+                        <p style="text-align: center; margin: 0">
+                            <button type="button" class="btn bg-deep-purple waves-effect" onclick="javascript: form_user_save();">ATUALIZAR DADOS</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="start_card">
+                <div class="card">
+                    <div class="header">
+                        <h2>SUA SENHA</h2>
+                    </div>
+                    <div class="body">
+                        <p style="text-align: justify">Preencha o formul&aacute;rio abaixo, se desejar redefinir sua senha.</p>
+                        <form id="form_pass" method="POST">
+                            <div class="form-group form-float">
+                                <label for="user_current_pass">Senha atual</label>
+                                <div class="form-line">
+                                    <input id="user_current_pass" name="user_current_pass" type="password" class="form-control" placeholder="Sua senha atual" required />
+                                </div>
+                            </div>
+                            <div class="form-group form-float">
+                                <label for="user_new_pass">Nova senha</label>
+                                <div class="form-line">
+                                    <input id="user_new_pass" name="user_new_pass" type="password" class="form-control" placeholder="Sua nova senha" required />
+                                </div>
+                            </div>
+                            <div class="form-group form-float">
+                                <label for="user_confirm_new_pass">Confirma&ccedil;&atilde;o</label>
+                                <div class="form-line">
+                                    <input id="user_confirm_new_pass" name="user_confirm_new_pass" type="password" class="form-control" placeholder="Confirma&ccedil;&atilde;o da sua nova senha" required />
+                                </div>
+                            </div>
+                        </form>
+                        <p style="text-align: center; margin: 0">
+                            <button type="button" class="btn bg-deep-purple waves-effect" onclick="javascript: form_pass_save();">ATUALIZAR SENHA</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block script %}
+<script src="{% static "web/bootstrap/js/pages/perfil.js" %}"></script>
+{% endblock script %}

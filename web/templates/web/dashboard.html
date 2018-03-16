@@ -1,0 +1,83 @@
+{% extends 'web/base.html' %}
+{% load staticfiles %}
+{% load l10n %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="block-header">
+            <h2>PAINEL DE CONTROLE</h2>
+        </div>
+
+        <!-- Widgets -->
+        <div class="row clearfix">
+            <div class="col-lg-4 col-md-4 col-sm-8 col-xs-16">
+                <div class="info-box bg-red hover-expand-effect">
+                    <div class="icon">
+                        <i class="material-icons">report</i>
+                    </div>
+                    <div class="content">
+                        <div class="text">PONTOS DE ATEN&Ccedil;&Atilde;O</div>
+                        <div id="issue_count" class="number count-to" data-from="0" data-to="{{ issue_count }}" data-speed="1000" data-fresh-interval="20"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-8 col-xs-16">
+                <div class="info-box bg-deep-orange hover-expand-effect">
+                    <div class="icon">
+                        <i class="material-icons">person</i>
+                    </div>
+                    <div class="content">
+                        <div class="text">PESSOAS EM CONFLITO</div>
+                        <div id="person_count" class="number count-to" data-from="0" data-to="{{ person_count }}" data-speed="1000" data-fresh-interval="20"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-8 col-xs-16">
+                <div class="info-box bg-light-green hover-expand-effect">
+                    <div class="icon">
+                        <i class="material-icons">forum</i>
+                    </div>
+                    <div class="content">
+                        <div class="text">ATENDIMENTOS REALIZADOS</div>
+                        <div id="treatment_count" class="number count-to" data-from="0" data-to="{{ treatment_count }}" data-speed="1000" data-fresh-interval="20"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- #END# Widgets -->
+        <div class="row clearfix">
+            <!-- Issues -->
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="card">
+                    <div class="header">
+                        <h2>MONITORAMENTO</h2>
+                    </div>
+                    <div class="body">
+                        <table 
+                            id="table_issues" 
+                            data-classes="table" 
+                            data-toggle="table"
+                            data-striped="true"
+                            data-unique-id="id">
+                            <thead>
+                                <tr>
+                                    <th data-field="created_at" class="col-xs-4 col-md-2">Quando</th>
+                                    <th data-field="text" class="col-xs-6 col-md-10">Mensagem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- #END# Issues -->
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block script %}
+<script src="{% static "web/bootstrap/js/pages/dashboard.js" %}"></script>
+{% endblock script %}
