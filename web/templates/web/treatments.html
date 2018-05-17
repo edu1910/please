@@ -11,22 +11,106 @@
 
         <div class="row clearfix">
             <!-- Treatments -->
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="start_card">
+            <div id="start_card" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                 <div class="card">
                     <div class="body">
                         <p style="text-align: justify">Ol&aacute;! Aqui n&oacute;s podemos fazer o atendimento das pessoas que est&atilde;o buscando nossa ajuda. Essa &eacute; uma tarefa de muita responsabilidade, pois essas pessoas podem encontrar, durante o nosso atendimento, a motiva&ccedil;&atilde;o necess&aacute;ria para continuarem vivas.</p>
                         <p style="text-align: justify">O nosso trabalho &eacute; muito importante e se ao menos uma vida puder ser salva j&aacute; ter&aacute; valido a pena. Vamos come&ccedil;ar?</p>
                         <p style="text-align: center; margin: 0">
-                            <button type="button" class="btn bg-deep-purple waves-effect" onclick="javascript: start_issues();">INICIAR ATENDIMENTO</button>
+                            <button type="button" class="btn bg-deep-purple waves-effect" onclick="javascript: start_treatment();">INICIAR ATENDIMENTO</button>
                         </p>
                     </div>
                 </div>
             </div>
             <!-- #END# Treatments -->
+            <div id="treatments_card" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" hidden>
+                <div class="card">
+                    <div id="treatments_loading" class="chat-loading">
+                        <div class="loading">
+                            <div class="loader">
+                                <div class="preloader pl-size-xs">
+                                    <div class="spinner-layer pl-deep-purple">
+                                        <div class="circle-clipper left">
+                                            <div class="circle"></div>
+                                        </div>
+                                        <div class="circle-clipper right">
+                                            <div class="circle"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="header">
+                        <h2>EM ATENDIMENTO<small>Clique em um atendimento para acompanhar</small></h2>
+                    </div>
+                    <div id="treatments_body" class="body horizontal-list" style="height: 108px;" hidden>
+                        <div id="treatments_content" class="horizontal-content">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="chat_card" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" hidden>
+                <div class="card">
+                    <div id="chat_closed" class="chat-closed" hidden>
+                        <div>
+                            <p id="chat_close_title" class="font-15 font-bold">Este atendimento foi finalizado.</p>
+                            <p id="chat_close_message" class="font-15">Obrigada :)</p>
+                        </div>
+                    </div>
+                    <div id="chat_loading" class="chat-loading" hidden>
+                        <div class="loading">
+                            <div class="loader">
+                                <div class="preloader pl-size-xs">
+                                    <div class="spinner-layer pl-deep-purple">
+                                        <div class="circle-clipper left">
+                                            <div class="circle"></div>
+                                        </div>
+                                        <div class="circle-clipper right">
+                                            <div class="circle"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p style="margin-top: 10px">Aguardando atendimento...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="header">
+                        <h2>CHAT DE ATENDIMENTO<small id="chat_volunteer_name"></small></h2>
+                    </div>
+                    <div class="body" style="padding: 0;">
+                        <div id="chat_content" class="chat-content">
+
+                        </div>
+                        <div id="chat_panel" class="chat-panel input-group" style="display: none">
+                            <textarea id="text_chat" class="form-control no-resize" rows="3" placeholder="Escreva sua mensagem"></textarea>
+                            <div class="input-group-addon">
+                                <button type="button" onclick="javascript: send_message();" class="btn bg-deep-purple btn-circle waves-effect waves-circle waves-float">
+                                    <i class="material-icons">send</i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="chat_footer" style="display: display; padding-bottom: 20px" hidden>
+                            <p style="text-align: center; margin-bottom: 0">
+                                <button type="button" class="btn btn-danger waves-effect" onclick="javascript: stop_treatments();">ENCERRAR</button>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 {% endblock content %}
 
 {% block script %}
+<script>
+    var is_manager = false;
+    var user_first_name = "{{ user.get_short_name }}";
+    {% if is_manager %}
+    is_manager = true;
+    {% endif %}
+</script>
+<script src="{% static "web/bootstrap/js/pages/treatments.js" %}"></script>
 {% endblock script %}

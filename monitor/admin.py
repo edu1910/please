@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
@@ -5,7 +8,7 @@ from django.contrib.auth.models import User, Group
 from django.forms.widgets import ClearableFileInput
 from django.db import models
 
-from .models import GroupManager, Profile, Person, Issue, Track, TweetBlackList, Treatment, Message
+from .models import GroupManager, Profile, Person, Issue, Track, TweetBlackList, Treatment, Message, Invite
 
 # Register your models here.
 @admin.register(GroupManager)
@@ -40,6 +43,10 @@ class TreatmentAdmin(admin.ModelAdmin):
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Invite)
+class InviteAdmin(admin.ModelAdmin):
     pass
 
 # Register your models here.

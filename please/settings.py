@@ -27,32 +27,44 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
 
 # Application definition
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(REDIS_HOST, 6379)],
+        },
+        "ROUTING": "please.routing.channel_routing",
+    },
+}
 
 INSTALLED_APPS = (
     'monitor',
     'web',
-    'simple_history',
+    'chat',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
+    'simple_history',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
-)
+]
 
 ROOT_URLCONF = 'please.urls'
 MEDIA_ROOT = 'web/static/'
@@ -107,3 +119,15 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+#PLEASE
+PLEASE_INVITE_MESSAGE = 'Olá. Se você quiser conversar com alguém, chama a gente na DM :)'
+
+
+#TWITTER KEYS
+TWITTER_CONSUMER_KEY = ''
+TWITTER_CONSUMER_SECRET = ''
+TWITTER_ACCESS_TOKEN_KEY = ''
+TWITTER_ACCESS_TOKEN_SECRET = ''
+TWITTER_OWNER_ID = ''

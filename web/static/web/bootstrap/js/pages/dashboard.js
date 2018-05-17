@@ -1,6 +1,8 @@
+var refreshIssues;
+
 $('#table_issues').bootstrapTable({
     formatNoMatches: function () {
-        return 'Opa! N&atilde;o temos nenhum <i>Ponto de Aten&ccedil;&atilde;o</i> detectado';
+        return 'Opa! N&atilde;o temos nenhum Ponto de Aten&ccedil;&atilde;o detectado';
     }
 });
 
@@ -9,13 +11,17 @@ $(function () {
 
     update_issues();
 
-    var refreshId = setInterval(function() {
+    setInterval(function() {
         update_issues();
     }, 10000);
 });
 
 function update_issues() {
-    $.getJSON( "/api/dashboard", function(data) {
+    if (refreshIssues) {
+        refreshIssues.abort()
+    }
+
+    refreshIssues = $.getJSON( "/api/dashboard/", function(data) {
         last_issue_count = parseInt($('#issue_count').html())
         last_person_count = parseInt($('#person_count').html())
         last_treatment_count = parseInt($('#treatment_count').html())

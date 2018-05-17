@@ -92,7 +92,8 @@
         <!-- Left Sidebar -->
         <aside id="leftsidebar" class="sidebar">
             <!-- User Info -->
-            <div class="user-info" style="height: 80px; padding: 0px 15px 0px 15px;">
+            <div class="user-info">
+                <img src="{% static "web/bootstrap/images/logo.png" %}" width="48" height="48" />
                 <div class="info-container">
                     <div class="name" id="name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {% if user.first_name %}
@@ -141,7 +142,7 @@
                     </li>
                     {% endif %}
                     {% if is_manager %}
-                    <li class="header">COORDENADOR</li>
+                    <li class="header">COORDENA&Ccedil;&Atilde;O</li>
                     <li {% if page == 'manager/users' %}class="active"{% endif %}>
                         <a href="/page/manager/users">
                             <i class="material-icons">person</i>
@@ -156,7 +157,7 @@
                     </li-->
                     {% endif %}
                     {% if is_admin %}
-                    <li class="header">ADMINISTRADOR</li>
+                    <li class="header">ADMINISTRA&Ccedil;&Atilde;O</li>
                     <li {% if page == 'admin/groups' %}class="active"{% endif %}>
                         <a href="/page/admin/groups">
                             <i class="material-icons">group</i>

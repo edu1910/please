@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.auth.models import User, Group, Permission
@@ -10,13 +13,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.db import transaction, IntegrityError
 
-import datetime, re, json, pytz
+import datetime, re, json
 import random
+import web.utils
 
-from monitor.models import Person, Issue, Track, TweetBlackList, GroupManager, Treatment
+from monitor.models import Person, Issue, Track, TweetBlackList, GroupManager, Treatment, Message, Invite
 from monitor.controller import list_permissions
-
-from web.permissions import admin_required, manager_required
+from monitor.permissions import admin_required, manager_required, has_permission_to_group, has_permission_to_user
 
 def render(request, context, template):
     template = loader.get_template('web/' + template)
@@ -40,7 +43,7 @@ def dashboard(request):
         issue_json = {}
         issue_json['id'] = issue.id
 
-        issue_json['created_at'] = _get_datetime_as_str(issue.created_at)
+        issue_json['created_at'] = web.utils.get_datetime_as_str(issue.created_at)
         issue_json['text'] = _encode_string_with_links(_normalize_text(issue.text)).replace("\n", "</br>")
         response_data['issues'].append(issue_json)
 
@@ -54,7 +57,7 @@ def issues(request):
     first_call = True
     next_issues = True
 
-    if request.POST.has_key('json_data'):
+    if 'json_data' in request.POST:
         request_json = json.loads(request.POST['json_data'])
         issues_json = request_json['issues']
         next_issues = bool(request_json['next'])
@@ -67,6 +70,26 @@ def issues(request):
                 if issue_json['confirmed']:
                     issue.person.status = 'N'
                     issue.person.save()
+
+                    invite_opened = Invite.objects.filter(is_sync=False, person=issue.person).first()
+
+                    if invite_opened is None:
+                        today_min = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
+                        today_max = datetime.datetime.combine(datetime.date.today(), datetime.time.max)
+
+                        today_invite = Invite.objects.filter(is_sync=True, sync_at__range=(today_min, today_max), person=issue.person).first()
+                        if today_invite is None:
+                            try:
+                                invite = Invite()
+                                invite.person = issue.person
+                                invite.issue = issue
+                                invite.save()
+                            except:
+                                pass
+                    else:
+                        invite_opened.created_at = datetime.datetime.now()
+                        invite_opened.issue = issue
+                        invite_opened.save()
                 else:
                     try:
                         blacklist = TweetBlackList.objects.get(text=issue.text)
@@ -91,7 +114,7 @@ def issues(request):
         for issue in issues:
             issue_json = {}
             issue_json['id'] = issue.id
-            issue_json['created_at'] = _get_datetime_as_str(issue.created_at)
+            issue_json['created_at'] = web.utils.get_datetime_as_str(issue.created_at)
             issue_json['text'] = _encode_string_with_links(_normalize_text(issue.text)).replace("\n", "</br>")
             response_data['issues'].append(issue_json)
 
@@ -110,7 +133,7 @@ def manager_users(request):
     users = User.objects.filter(is_active=True).order_by('first_name', 'username')
 
     for user in users:
-        if _has_permission_to_user(request, user.id):
+        if has_permission_to_user(request.user, user.id):
             user_json = {}
             user_json['id'] = user.id
             user_json['name'] = user.first_name
@@ -119,6 +142,34 @@ def manager_users(request):
             user_json['groups'] = _get_names_user_groups(user.groups.all().order_by('name'))
 
             response_data['users'].append(user_json)
+
+    return JsonResponse(response_data)
+
+@login_required
+@csrf_exempt
+@manager_required()
+@require_http_methods(["GET", "POST", "DELETE"])
+def manager_user(request, user_id=None):
+    if request.method == "GET":
+        return _admin_get_user(request, user_id)
+    elif request.method == "POST":
+        return _admin_edit_user(request, user_id)
+    elif request.method == "DELETE":
+        return _admin_delete_user(request, user_id)
+
+@login_required
+@manager_required()
+def manager_treatments(request):
+    response_data = {}
+    response_data['treatments'] = []
+
+    if request.user.is_superuser:
+        treatments = Treatment.objects.filter(user__isnull=False, is_closed=False).order_by('created_at', 'id')
+    else:
+        groups = GroupManager.objects.filter(user=request.user).only('group')
+        treatments = Treatment.objects.filter(user__isnull=False, is_closed=False, user__groups__in=groups).order_by('created_at', 'id')
+
+    response_data['treatments'] = _treatments_to_json(treatments)
 
     return JsonResponse(response_data)
 
@@ -149,24 +200,12 @@ def admin_group(request, group_id=None):
 
 @login_required
 @csrf_exempt
-@manager_required()
-@require_http_methods(["GET", "POST", "DELETE"])
-def manager_user(request, user_id=None):
-    if request.method == "GET":
-        return _admin_get_user(request, user_id)
-    elif request.method == "POST":
-        return _admin_edit_user(request, user_id)
-    elif request.method == "DELETE":
-        return _admin_delete_user(request, user_id)
-
-@login_required
-@csrf_exempt
 @require_http_methods(["POST"])
 def user_perfil(request):
     response_data = {'success': False}
     response_data['error_msg'] = "Erro no servidor."
 
-    if request.POST.has_key('json_data'):
+    if 'json_data' in request.POST:
         try:
             request_json = json.loads(request.POST['json_data'])
 
@@ -193,7 +232,7 @@ def user_pass(request):
     response_data = {'success': False}
     response_data['error_msg'] = "Erro no servidor."
 
-    if request.POST.has_key('json_data'):
+    if 'json_data' in request.POST:
         try:
             request_json = json.loads(request.POST['json_data'])
 
@@ -234,7 +273,7 @@ def _admin_get_user(request, user_id):
     response_data = {'success': False}
     response_data['error_msg'] = "Erro no servidor."
 
-    if _has_permission_to_user(request, user_id):
+    if has_permission_to_user(request.user, user_id):
         try:
             response_data['user'] = _user_to_data_json(request, User.objects.get(id=user_id))
             response_data['success'] = True
@@ -259,14 +298,14 @@ def _admin_delete_user(request, user_id=None):
     response_data = {'success': False}
     response_data['error_msg'] = "Erro no servidor."
 
-    if _has_permission_to_user(request, user_id):
+    if has_permission_to_user(request.user, user_id):
         try:
             user = User.objects.get(id=user_id)
             cant = user.is_superuser or user.id == request.user.id
 
             if not cant:
                 for group in user.groups.all():
-                    if not _has_permission_to_group(request, group.id):
+                    if not has_permission_to_group(request.user, group.id):
                         cant = True
                         break
 
@@ -292,7 +331,7 @@ def _admin_save_group(request, group=None):
     response_data = {'success': False}
     response_data['error_msg'] = "Erro no servidor."
 
-    if request.POST.has_key('json_data'):
+    if 'json_data' in request.POST:
         try:
             request_json = json.loads(request.POST['json_data'])
 
@@ -339,8 +378,8 @@ def _admin_save_user(request, user=None):
     response_data = {'success': False}
     response_data['error_msg'] = "Erro no servidor."
 
-    if _has_permission_to_user(request, user.id if user is not None else None):
-        if request.POST.has_key('json_data'):
+    if has_permission_to_user(request.user, user.id if user is not None else None):
+        if 'json_data' in request.POST:
             try:
                 request_json = json.loads(request.POST['json_data'])
 
@@ -367,11 +406,11 @@ def _admin_save_user(request, user=None):
                     current_groups = user.groups.all()
                     for current_group in current_groups:
                         if current_group.id not in groups:
-                            if _has_permission_to_group(request, current_group.id):
+                            if has_permission_to_group(request.user, current_group.id):
                                 user.groups.remove(current_group)
 
                     for group in groups:
-                        if _has_permission_to_group(request, group):
+                        if has_permission_to_group(request.user, group):
                             user.groups.add(Group.objects.get(id=group))
 
                     user.save()
@@ -381,43 +420,6 @@ def _admin_save_user(request, user=None):
                 response_data['error_msg'] = "J&aacute; existe um volunt&aacute;rio com este usu&aacute;rio."
 
     return JsonResponse(response_data)
-
-def _has_permission_to_group(request, group_id):
-    has = request.user.is_superuser or group_id is None
-
-    if not has:
-        try:
-            group = Group.objects.get(id=group_id)
-            groupManager = GroupManager.objects.get(group=group)
-        except:
-            groupManager = None
-
-        has = (groupManager is not None) and (groupManager.user.id == request.user.id)
-
-    return has
-
-def _has_permission_to_user(request, user_id):
-    has = request.user.is_superuser or user_id is None
-
-    if not has:
-        try:
-            user = User.objects.get(id=user_id)
-            groups = user.groups.all().order_by('name')
-            has = len(groups) == 0
-
-            if not has:
-                for group in groups:
-                    try:
-                        groupManager = GroupManager.objects.get(group=group)
-                        if groupManager.user.id == request.user.id:
-                            has = True
-                            break
-                    except:
-                        pass
-        except:
-            pass
-
-    return has
 
 def _user_to_data_json(request, user):
     user_json = {}
@@ -436,7 +438,7 @@ def _group_to_data_json(request, group):
     group_json = {}
     group_json['id'] = group.id
     group_json['name'] = group.name
-    group_json['has_permission'] = _has_permission_to_group(request, group.id)
+    group_json['has_permission'] = has_permission_to_group(request.user, group.id)
 
     manager = _get_group_manager(group)
     if manager != None:
@@ -456,11 +458,22 @@ def _group_to_data_json(request, group):
 
     return group_json
 
+def _treatments_to_json(treatments):
+    treatments_json = []
+
+    for treatment in treatments:
+        treatment_json = {}
+        treatment_json['id'] = treatment.id
+        treatment_json['user'] = treatment.user.first_name
+        treatments_json.append(treatment_json)
+
+    return treatments_json
+
 def _group_to_json(request, group):
     group_json = {}
     group_json['id'] = group.id
     group_json['name'] = group.name
-    group_json['has_permission'] = _has_permission_to_group(request, group.id)
+    group_json['has_permission'] = has_permission_to_group(request.user, group.id)
 
     manager = _get_group_manager(group)
     manager_name = None
@@ -496,27 +509,6 @@ def _normalize_text(text):
 def _encode_string_with_links(unencoded_string):
     URL_REGEX = re.compile(r"((http://|https://)[^ <>'\"{}|\\^`^:[\]]*)")
     return URL_REGEX.sub(r'', unencoded_string)
-
-def _get_datetime_as_str(dt):
-    timezone = pytz.timezone("America/Sao_Paulo")
-    dt_tz = pytz.utc.localize(dt).astimezone(timezone)
-
-    day_str = _get_weekday_as_str(dt, timezone)
-    time_str = dt_tz.strftime("%H:%M:%S")
-
-    return day_str + ' &agrave;s ' + time_str
-
-def _get_weekday_as_str(dt, timezone):
-    today = pytz.utc.localize(datetime.datetime.today()).astimezone(timezone)
-    dt_tz = pytz.utc.localize(dt).astimezone(timezone)
-
-    weekday_list = ['Hoje','Ontem','Dom','Seg','Ter','Qua','Qui','Sex','S&aacute;b']
-    weekday_num = int(dt_tz.strftime("%w"))
-
-    diff = (today.date() - dt_tz.date()).days
-    weekday = weekday_list[diff if diff < 2 else weekday_num+2]
-
-    return weekday
 
 def _get_group_manager(group):
     manager = None

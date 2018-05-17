@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-default_app_config = 'web.apps.WebConfig'
+default_app_config = 'chat.apps.ChatConfig'

@@ -1,8 +1,9 @@
 var issues = [];
+var refreshIssues;
 
 $('#table_issues').bootstrapTable({
     formatNoMatches: function () {
-        return 'Opa! N&atilde;o temos nenhum <i>Ponto de Aten&ccedil;&atilde;o</i> aguardando triagem';
+        return 'Opa! N&atilde;o temos nenhum Ponto de Aten&ccedil;&atilde;o aguardando triagem';
     }
 });
 
@@ -29,7 +30,11 @@ function start_issues() {
         json_data: JSON.stringify({issues: issues, next: true})
     };
 
-    $.ajax({
+    if (refreshIssues) {
+        refreshIssues.abort();
+    }
+
+    refreshIssues = $.ajax({
         url: '/api/issues/',
         type: 'POST',
         dataType: 'json',
@@ -59,7 +64,11 @@ function stop_issues() {
         json_data: JSON.stringify({issues: issues, next: false})
     };
 
-    $.ajax({
+    if (refreshIssues) {
+        refreshIssues.abort();
+    }
+
+    refreshIssues = $.ajax({
         url: '/api/issues/',
         type: 'POST',
         dataType: 'json',
@@ -84,7 +93,7 @@ function hide_loading() {
 }
 
 
-function unload_page(){
+function unload_page() {
     //return "You have unsaved changes on this page. Do you want to leave this page and discard your changes or stay on this page?";
 }
 

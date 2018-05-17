@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.auth.models import User, Group
@@ -13,8 +16,7 @@ import datetime, re, json, pytz
 
 from monitor.models import Person, Issue, Track, TweetBlackList, GroupManager
 from monitor.controller import list_permissions
-
-from web.permissions import admin_required, manager_required
+from monitor.permissions import admin_required, manager_required
 
 def render(request, context, template):
     template = loader.get_template('web/' + template)
@@ -34,15 +36,15 @@ def handler404(request):
     return response
 
 def user_login(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return redirect('/')
     else:
         context = {'error': False}
-        if (request.POST.has_key('username')
-                and request.POST.has_key('password')):
+        if ('username' in request.POST
+                and 'password' in request.POST):
             username = request.POST['username']
             password = request.POST['password']
-            remember = request.POST.has_key('remember')
+            remember = 'remember' in request.POST
 
             user = authenticate(username=username, password=password)
             if user is not None:

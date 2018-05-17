@@ -21,10 +21,10 @@ urlpatterns = [
     url(r'^api/manager/users/$', api.manager_users),
     url(r'^api/manager/user/$', api.manager_user),
     url(r'^api/manager/user/(?P<user_id>\w+)/$', api.manager_user),
+    url(r'^api/manager/treatments/$', api.manager_treatments),
     url(r'^api/admin/groups/$', api.admin_groups),
     url(r'^api/admin/group/$', api.admin_group),
     url(r'^api/admin/group/(?P<group_id>\w+)/$', api.admin_group),
-
     url(r'^api/user/perfil/$', api.user_perfil),
     url(r'^api/user/pass/$', api.user_pass),
 ]

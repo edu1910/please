@@ -3,6 +3,112 @@
 .table-select tr {
     cursor: pointer;
 }
+.chat-loading {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: #00000020;
+    z-index: 10;
+}
+.chat-loading div.loading {
+    text-align: center;
+    padding: 20px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+    border-radius: 4px;
+}
+.chat-closed {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: #00000020;
+    z-index: 10;
+}
+.chat-closed div {
+    background-color: #6942b4;
+    text-align: center;
+    padding: 20px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+    border-radius: 4px;
+}
+.chat-closed div p {
+    color: white;
+    padding: 0;
+    margin: 0;
+}
+.chat-panel {
+    background-color: rgba(204, 204, 204, 0.35);
+    padding: 20px;
+}
+.chat-panel textarea {
+    border-radius: 8px !important;
+    padding: 8px !important;
+}
+.chat-panel div {
+    padding: 0 !important;
+    padding-left: 8px !important;
+}
+.chat-content {
+    padding: 0 20px 0 20px;
+    height: 300px;
+    overflow-y: auto;
+}
+.chat-message p.title {
+    margin: 0;
+    color: black;
+}
+.chat-message p.datetime {
+    margin: 0;
+    margin-top: 12px;
+    text-align: right;
+    font-size: 9pt;
+    color: #777;
+}
+.chat-message {
+    margin-top: 16px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    padding: 16px;
+    padding-bottom: 4px;
+    width: 40%;
+    min-width: 200px;
+}
+.chat-message-sent {
+    background-color: #f5f2fa;
+    margin-left: auto;
+}
+.chat-message-rcvd {
+    background-color: #e4dcf2;
+    margin-right: auto;
+}
+.horizontal-list {
+    overflow-y: hidden !important;
+    overflow-x: auto !important;
+    margin: auto !important;
+}
+.horizontal-content {
+    height: 100% !important;
+}
+.treatment-item {
+    color: white !important;
+    margin: 8px !important;
+    padding: 8px !important;
+    border-radius: 32px !important;
+    float: left !important;
+    text-align: center !important;
+    width: 128px !important;
+    background-color: #6942b4 !important;
+}
+.treatment-item h4 {
+    margin: 0;
+}
 .navbar {
   font-family: "Roboto", sans-serif;
   -webkit-border-radius: 0;
@@ -7520,7 +7626,7 @@ fieldset[disabled] .form-control {
     white-space: nowrap;
     position: relative;
     border-bottom: 1px solid #e9e9e9;
-    background: url("../images/user-img-background.jpg") no-repeat no-repeat;
+    background: url("../images/user-img-background.png") no-repeat no-repeat;
     height: 135px; }
     .sidebar .user-info .image {
       margin-right: 12px;
@@ -8040,4 +8146,3 @@ html.ie11 .dropdown-menu ul.menu li a {
 
 html.ie11 .bs-searchbox .form-control {
   width: 90%; }
-

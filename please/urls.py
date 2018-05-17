@@ -22,5 +22,5 @@ handler500 = 'web.views.handler500'
 urlpatterns = [
     url(r'^$', include('web.urls')),
     url(r'^/*', include('web.urls')),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 ]

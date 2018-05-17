@@ -10,9 +10,11 @@ from django.utils import timezone
 from django.db import transaction
 
 from monitor.models import Person, Issue, Track, TweetBlackList
+from monitor import apps as monitor
+
 from datetime import datetime
 
-import config, signal, sys, twitter
+import signal, sys, twitter
 
 has_exit = False
 
@@ -24,22 +26,13 @@ def signal_handler(signal, frame):
     sys.exit(0)
 
 def print_issue(issue):
-    print '--------------------------------------'
-    print 'Issue ' + ': ' + issue.text
-    print 'Person' + ': @' + issue.person.name
-    print '--------------------------------------'
+    print('--------------------------------------')
+    print('Issue ' + ': ' + issue.text)
+    print('Person' + ': @' + issue.person.name)
+    print('--------------------------------------')
 
-def main():
+def run():
     signal.signal(signal.SIGINT, signal_handler)
-    print("Conectando...")
-
-    api = twitter.Api(consumer_key=config.TWITTER_CONSUMER_KEY,
-            consumer_secret=config.TWITTER_CONSUMER_SECRET,
-            access_token_key=config.TWITTER_ACCESS_TOKEN_KEY,
-            access_token_secret=config.TWITTER_ACCESS_TOKEN_SECRET,
-            sleep_on_rate_limit=True)
-
-    print("Conectado!")
 
     track_objects = Track.objects.all()
     tracks = []
@@ -48,12 +41,12 @@ def main():
         tracks.append(track_object.phrase)
 
     while not has_exit:
-        stream = api.GetStreamFilter(track=tracks,languages=['pt'])
+        stream = monitor.twitter_api.GetStreamFilter(track=tracks,languages=['pt'])
         print("Canal aberto!")
 
         try:
             while True:
-                tweet = stream.next()
+                tweet = stream.__next__()
 
                 user_id = tweet['user']['id']
                 profile_image_url = tweet['user']['profile_image_url']
@@ -68,8 +61,8 @@ def main():
 
                 try:
                     tweet_url = tweet['entities']['urls'][0]['expanded_url']
-                except:
-                    pass
+                except Exception as e:
+                    print(e)
 
                 text = tweet['text']
                 coordinates = None
@@ -89,7 +82,7 @@ def main():
 
                         try:
                             person = Person.objects.get(user_id=user_id)
-                        except:
+                        except Exception as e:
                             person = Person()
                             person.user_id = user_id
                             person.status = status
@@ -116,7 +109,7 @@ def main():
 
                         print_issue(issue)
                 else:
-                    print 'Blacklist: ' + text
+                    print('Blacklist: ' + text)
         except Exception as e:
             print(e)
 
@@ -131,4 +124,4 @@ def main():
                 print(e)
 
 if __name__ == "__main__":
-    main()
+    run()

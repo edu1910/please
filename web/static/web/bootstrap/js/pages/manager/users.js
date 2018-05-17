@@ -3,7 +3,7 @@ var edit_id = null;
 
 $('#table_users').bootstrapTable({
     formatNoMatches: function () {
-        return 'Opa! N&atilde;o temos nenhum <i>Volunt&aacute;rio</i> a exibir';
+        return 'Opa! N&atilde;o temos nenhum Volunt&aacute;rio a exibir';
     }
 });
 
@@ -51,7 +51,7 @@ $(function () {
 
 function update_users() {
     show_loading();
-    $.getJSON( "/api/manager/users", function(data) {
+    $.getJSON( "/api/manager/users/", function(data) {
         $('#table_users').bootstrapTable("load", data.users);
     }).always(function() {
         hide_loading();
@@ -61,7 +61,7 @@ function update_users() {
 function update_groups() {
     show_loading();
     $.ajax({
-        url: "/api/admin/groups",
+        url: "/api/admin/groups/",
         type: 'GET',
         async: false,
         success: function (data) {

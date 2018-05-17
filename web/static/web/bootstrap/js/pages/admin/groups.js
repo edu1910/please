@@ -1,5 +1,7 @@
 var validator;
 var edit_id = null;
+var refreshGroups;
+var refreshUsers;
 
 $('#table_groups').bootstrapTable({
     formatNoMatches: function () {
@@ -43,7 +45,10 @@ $(function () {
 
 function update_groups() {
     show_loading();
-    $.getJSON( "/api/admin/groups", function(data) {
+    if (refreshGroups) {
+        refreshGroups.abort();
+    }
+    refreshGroups = $.getJSON( "/api/admin/groups/", function(data) {
         $('#table_groups').bootstrapTable("load", data.groups);
     }).always(function() {
         hide_loading();
@@ -52,8 +57,11 @@ function update_groups() {
 
 function update_users() {
     show_loading();
-    $.ajax({
-        url: "/api/manager/users",
+    if (refreshUsers) {
+        refreshUsers.abort();
+    }
+    refreshUsers = $.ajax({
+        url: "/api/manager/users/",
         type: 'GET',
         async: false,
         success: function (data) {
@@ -63,7 +71,7 @@ function update_users() {
 
             select.append($('<option>', {
                 value: '',
-                text: '-- Selecione o coordenador --'
+                text: '-- Selecione quem coordena --'
             }));
 
             $.each(users, function(key, val) {
