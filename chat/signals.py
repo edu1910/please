@@ -37,7 +37,7 @@ def save_treatment(sender, instance=None, created=False, **kwargs):
         if treatment.is_closed:
             json_obj = {"action": "closed"}
             treatment.websocket_group.send({"text": json.dumps(json_obj)})
-        elif treatment.user is None:
+        elif created:
             consumers.treatment_go(treatment)
 
 def retry_send(message):

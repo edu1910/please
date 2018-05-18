@@ -5,10 +5,12 @@ import json
 
 import web.utils
 
+from django.core.cache import cache
+
 from datetime import datetime
 
 from channels.auth import channel_session_user_from_http, channel_session_user
-from channels import Channel
+from channels import Channel, Group as ChannelGroup
 
 from monitor.models import Treatment, Message
 
@@ -17,7 +19,8 @@ from monitor.permissions import manager_required, has_permission_to_user
 
 from chat.exceptions import ClientError
 
-_users_waiting = {}
+LOCK_EXPIRE = 60 * 5 # Lock expires in 5 minutes
+
 
 @channel_session_user_from_http
 def ws_connect(message):
@@ -26,9 +29,7 @@ def ws_connect(message):
 
 @channel_session_user
 def ws_disconnect(message):
-    if message.user in _users_waiting:
-        if message.reply_channel == _users_waiting[message.user]:
-            _users_waiting.pop(message.user)
+    ChannelGroup("treatment-waiting").discard(message.reply_channel)
 
     for treatment_id in message.channel_session.get("treatments", []):
         try:
@@ -45,11 +46,9 @@ def ws_receive(message):
 
 @channel_session_user
 def treatment_wait(message):
-    if message.user in _users_waiting:
-        reply_channel = _users_waiting.pop(message.user)
-        reply_channel.send({"text": json.dumps({"action": "close"})})
+    ChannelGroup("treatment-waiting").discard(message.reply_channel)
+    ChannelGroup("treatment-waiting").add(message.reply_channel)
 
-    _users_waiting[message.user] = message.reply_channel
     message.reply_channel.send({"text": json.dumps({"action": "waiting"})})
 
     waiting_treatments = Treatment.objects.filter(user__isnull=True, is_closed=False).order_by('created_at', 'id')
@@ -99,36 +98,42 @@ def treatment_send(message):
     _treatment_send(message, treatment)
 
 def treatment_go(treatment):
-    if len(_users_waiting) > 0:
-        user = list(_users_waiting.keys())[0]
-        reply_channel = _users_waiting[user]
-        reply_channel.send({"text": json.dumps({"action": "go_treating", "treatment": treatment.id})})
+    ChannelGroup("treatment-waiting").send({"text": json.dumps({"action": "go_treating", "treatment": treatment.id})})
 
 def _treatment_begin(message, treatment):
-    if treatment is not None and (treatment.is_closed or (treatment.user is not None and treatment.user != message.user)):
-        raise ClientError("TREATMENT_ACCESS_DENIED")
+    lock_id = "consumers.treatment-begin"
 
-    try:
-        current_treatment = Treatment.objects.get(user=message.user,is_closed=False)
-    except:
-        current_treatment = None
+    acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
+    release_lock = lambda: cache.delete(lock_id)
 
-    if current_treatment:
-        treatment = current_treatment
-    else:
-        treatment.user = message.user
-        treatment.treatment_at = datetime.now()
-        treatment.save()
+    if acquire_lock():
+        try:
+            if treatment is not None and (treatment.is_closed or (treatment.user is not None and treatment.user != message.user)):
+                raise ClientError("TREATMENT_ACCESS_DENIED")
 
-    treatment.websocket_group.add(message.reply_channel)
 
-    message.channel_session['treatments'] = list(set(message.channel_session['treatments']).union([treatment.id]))
-    message.reply_channel.send({"text": json.dumps({"action": "treating", "treatment": treatment.id})})
+            try:
+                current_treatment = Treatment.objects.get(user=message.user,is_closed=False)
+            except:
+                current_treatment = None
 
-    _send_treatment_messages(message.reply_channel, treatment)
+            if current_treatment:
+                treatment = current_treatment
+            else:
+                treatment.user = message.user
+                treatment.treatment_at = datetime.now()
+                treatment.save()
+
+            treatment.websocket_group.add(message.reply_channel)
+
+            message.channel_session['treatments'] = list(set(message.channel_session['treatments']).union([treatment.id]))
+            message.reply_channel.send({"text": json.dumps({"action": "treating", "treatment": treatment.id})})
+
+            _send_treatment_messages(message.reply_channel, treatment)
+        finally:
+            release_lock()
 
 def _send_treatment_messages(reply_channel, treatment):
-    #print("MENSAGEM! " + len(treatment.messages))
     for treatment_message in treatment.messages.all().order_by('created_at', 'id'):
         json_ojb = {"action": "text", "message": treatment_message.text, "datetime": web.utils.get_datetime_as_str(treatment_message.created_at), "was_received": treatment_message.msg_type=='R'}
         reply_channel.send({"text": json.dumps(json_ojb)})
