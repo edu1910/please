@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: latin-1 -*-
+# -*- coding: utf-8 -*-
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "please.settings")
 
@@ -14,7 +14,7 @@ from monitor import apps as monitor
 
 from datetime import datetime
 
-import signal, sys, twitter
+import signal, sys, twitter, time
 
 has_exit = False
 
@@ -24,12 +24,6 @@ def signal_handler(signal, frame):
     has_exit = True
     print('Bye')
     sys.exit(0)
-
-def print_issue(issue):
-    print('--------------------------------------')
-    print('Issue ' + ': ' + issue.text)
-    print('Person' + ': @' + issue.person.name)
-    print('--------------------------------------')
 
 def run():
     signal.signal(signal.SIGINT, signal_handler)
@@ -49,23 +43,11 @@ def run():
                 tweet = stream.__next__()
 
                 user_id = tweet['user']['id']
-                profile_image_url = tweet['user']['profile_image_url']
-                location = tweet['user']['location']
-                friends_count = tweet['user']['friends_count']
-                name = tweet['user']['name']
-                screen_name = tweet['user']['screen_name']
                 status = 'I'
 
                 tweet_id = tweet['id']
-                tweet_url = None
-
-                try:
-                    tweet_url = tweet['entities']['urls'][0]['expanded_url']
-                except Exception as e:
-                    print(e)
 
                 text = tweet['text']
-                coordinates = None
                 created_at = None
 
                 if tweet['is_quote_status']:
@@ -87,31 +69,24 @@ def run():
                             person.user_id = user_id
                             person.status = status
 
-                        person.profile_image_url = profile_image_url
-                        person.location = location
-                        person.friends_count = friends_count
-                        person.name = name
-                        person.screen_name = screen_name
-
-                        person.save()
+                            person.save()
 
                         issue = Issue()
 
                         issue.person = person
                         issue.tweet_id = tweet_id
-                        issue.tweet_url = tweet_url
                         issue.text = text
-                        issue.coordinates = coordinates
                         issue.created_at = created_at
                         issue.status = 'I'
 
                         issue.save()
 
-                        print_issue(issue)
+                        print_issue("Issue identificada")
                 else:
-                    print('Blacklist: ' + text)
+                    print('Blacklist')
         except Exception as e:
             print(e)
+            time.sleep(60)
 
             try:
                 stream.close()
