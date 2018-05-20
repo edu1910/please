@@ -83,13 +83,6 @@ def save_treatment(sender, instance=None, created=False, **kwargs):
         elif treatment.is_closed:
             json_obj = {"action": "closed"}
             treatment.websocket_group.send({"text": json.dumps(json_obj)})
-            message = Message()
-            message._dirty = True
-            message.treatment = treatment
-            message.created_at = datetime.datetime.now()
-            message.text = config.PLEASE_TREATMENT_CLODED_MESSAGE % web.utils.get_now_as_str()
-            message.msg_type = 'S'
-            message.save()
 
 def retry_send(message):
     with transaction.atomic():

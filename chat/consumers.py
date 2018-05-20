@@ -12,10 +12,12 @@ from datetime import datetime
 from channels.auth import channel_session_user_from_http, channel_session_user
 from channels import Channel, Group as ChannelGroup
 
+from constance import config
+
 from monitor.models import Treatment, Message
+from monitor.permissions import manager_required, has_permission_to_user
 
 from chat.utils import get_treatment_or_error, catch_client_error
-from monitor.permissions import manager_required, has_permission_to_user
 
 from chat.exceptions import ClientError
 
@@ -149,6 +151,13 @@ def _treatment_end(message, treatment):
 
     treatment.is_closed = True
     treatment.save()
+
+    message = Message()
+    message.treatment = treatment
+    message.created_at = datetime.now()
+    message.text = config.PLEASE_TREATMENT_CLODED_MESSAGE % web.utils.get_now_as_str()
+    message.msg_type = 'S'
+    message.save()
 
     treatment.websocket_group.send({"text": json.dumps({"action": "closed"})})
     message.channel_session['treatments'] = list(set(message.channel_session['treatments']).difference([treatment.id]))
