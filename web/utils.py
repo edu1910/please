@@ -3,6 +3,15 @@ from __future__ import unicode_literals
 
 import datetime, pytz
 
+def get_now_as_str():
+    timezone = pytz.timezone("America/Sao_Paulo")
+    today = pytz.utc.localize(datetime.datetime.today()).astimezone(timezone)
+
+    day_str = today.strftime("%d/%m/%Y")
+    time_str = today.strftime("%H:%M:%S")
+
+    return day_str + ' ' + time_str
+
 def get_datetime_as_str(dt):
     timezone = pytz.timezone("America/Sao_Paulo")
     today = pytz.utc.localize(datetime.datetime.today()).astimezone(timezone)

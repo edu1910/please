@@ -53,6 +53,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'channels',
     'simple_history',
+    'constance',
 )
 
 MIDDLEWARE = [
@@ -121,13 +122,32 @@ USE_TZ = False
 STATIC_URL = '/static/'
 
 
-#PLEASE
-PLEASE_INVITE_MESSAGE = 'Olá. Se você quiser conversar com alguém, chama a gente na DM :)'
+#CONSTANCE
+CONSTANCE_IGNORE_ADMIN_VERSION_CHECK = True
+
+CONSTANCE_CONFIG = {
+    'TWITTER_CONSUMER_KEY': ('', 'Twitter consumer key', str),
+    'TWITTER_CONSUMER_SECRET': ('', 'Twitter consumer secret', str),
+    'TWITTER_ACCESS_TOKEN_KEY': ('', 'Twitter access token key', str),
+    'TWITTER_ACCESS_TOKEN_SECRET': ('', 'Twitter access token secret', str),
+    'TWITTER_OWNER_ID': ('', 'Twitter owner/account id', str),
+    'PLEASE_TREATMENT_IS_ACTIVE': (False, 'Treatment is active', bool),
+    'PLEASE_INVITE_MESSAGE': ('', 'Mensagem automática de convite', str),
+    'PLEASE_TREATMENT_INACTIVE_MESSAGE': ('', 'Resposta automática de atendimento indisponível', str),
+    'PLEASE_TREATMENT_WAITING_MESSAGE': ('', 'Resposta automática de espera para atendimento', str),
+    'PLEASE_TREATMENT_CLODED_MESSAGE': ('', 'Mensagem automática de atendimento finalizado', str),
+    'PLEASE_TREATMENT_ACTIVE_TWEET_MESSAGE': ('', 'Mensagem de Tweet para atendimento aberto', str),
+    'PLEASE_TREATMENT_INACTIVE_TWEET_MESSAGE': ('', 'Mensagem de Tweet para atendimento fechado', str),
+}
 
 
-#TWITTER KEYS
-TWITTER_CONSUMER_KEY = ''
-TWITTER_CONSUMER_SECRET = ''
-TWITTER_ACCESS_TOKEN_KEY = ''
-TWITTER_ACCESS_TOKEN_SECRET = ''
-TWITTER_OWNER_ID = ''
+CONSTANCE_CONFIG_FIELDSETS = {
+    'Twitter App': ('TWITTER_CONSUMER_KEY', 'TWITTER_CONSUMER_SECRET', \
+                    'TWITTER_ACCESS_TOKEN_KEY', 'TWITTER_ACCESS_TOKEN_SECRET', \
+                    'TWITTER_OWNER_ID'),
+    'General': ('PLEASE_TREATMENT_IS_ACTIVE', 'PLEASE_INVITE_MESSAGE', \
+                'PLEASE_TREATMENT_INACTIVE_MESSAGE', 'PLEASE_TREATMENT_WAITING_MESSAGE',
+                'PLEASE_TREATMENT_CLODED_MESSAGE',
+                'PLEASE_TREATMENT_ACTIVE_TWEET_MESSAGE',
+                'PLEASE_TREATMENT_INACTIVE_TWEET_MESSAGE'),
+}

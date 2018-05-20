@@ -81,7 +81,7 @@ def run():
 
                         issue.save()
 
-                        print_issue("Issue identificada")
+                        print("Issue identificada")
                 else:
                     print('Blacklist')
         except Exception as e:

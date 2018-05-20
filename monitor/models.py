@@ -6,6 +6,9 @@ from channels import Group as ChannelGroup
 
 from simple_history.models import HistoricalRecords
 
+import datetime
+
+
 @python_2_unicode_compatible
 class GroupManager(models.Model):
     history = HistoricalRecords()
@@ -98,7 +101,7 @@ class TweetBlackList(models.Model):
 class Treatment(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=datetime.datetime.now())
     treatment_at = models.DateTimeField(blank=True, null=True)
     closed_at = models.DateTimeField(blank=True, null=True)
     is_closed = models.BooleanField(default=False)
@@ -125,7 +128,7 @@ class Message(models.Model):
     )
 
     treatment = models.ForeignKey(Treatment, on_delete=models.CASCADE, related_name='messages')
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=datetime.datetime.now())
     external_id = models.CharField(max_length=32)
     text = models.TextField()
     is_sync = models.BooleanField(default=False)
@@ -138,7 +141,7 @@ class Message(models.Model):
 class Invite(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     issue = models.OneToOneField(Issue, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=datetime.datetime.now())
     is_sync = models.BooleanField(default=False)
     sync_at = models.DateTimeField(blank=True, null=True)
 
