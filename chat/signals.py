@@ -46,9 +46,10 @@ def save_message(sender, instance=None, created=False, **kwargs):
         last_message = treatment.messages.filter(msg_type='R', is_sync=True).order_by('-created_at').first()
 
         if last_message is not None and treatment.slots_date != last_message.created_at:
-            treatment.slots_date = last_message.created_at
-            treatment.slots_count = 5
-            treatment.save()
+            if not treatment.is_closed:
+                treatment.slots_date = last_message.created_at
+                treatment.slots_count = 5
+                treatment.save()
 
 @receiver(post_save, sender=Treatment)
 def save_treatment(sender, instance=None, created=False, **kwargs):
@@ -58,17 +59,7 @@ def save_treatment(sender, instance=None, created=False, **kwargs):
 
         treatment = instance
 
-        if treatment.is_closed:
-            json_obj = {"action": "closed"}
-            treatment.websocket_group.send({"text": json.dumps(json_obj)})
-            message = Message()
-            message._dirty = True
-            message.treatment = treatment
-            message.created_at = datetime.datetime.now()
-            message.text = config.PLEASE_TREATMENT_CLODED_MESSAGE % web.utils.get_now_as_str()
-            message.msg_type = 'S'
-            message.save()
-        elif created:
+        if created:
             if config.PLEASE_TREATMENT_IS_ACTIVE:
                 if not consumers.treatment_go(treatment):
                     message = Message()
@@ -79,6 +70,9 @@ def save_treatment(sender, instance=None, created=False, **kwargs):
                     message.msg_type = 'S'
                     message.save()
             else:
+                treatment._dirty = True
+                treatment.is_closed = True
+                treatment.save()
                 message = Message()
                 message._dirty = True
                 message.treatment = treatment
@@ -86,9 +80,16 @@ def save_treatment(sender, instance=None, created=False, **kwargs):
                 message.text = config.PLEASE_TREATMENT_INACTIVE_MESSAGE % web.utils.get_now_as_str()
                 message.msg_type = 'S'
                 message.save()
-                treatment._dirty = True
-                treatment.is_closed = True
-                treatment.save()
+        elif treatment.is_closed:
+            json_obj = {"action": "closed"}
+            treatment.websocket_group.send({"text": json.dumps(json_obj)})
+            message = Message()
+            message._dirty = True
+            message.treatment = treatment
+            message.created_at = datetime.datetime.now()
+            message.text = config.PLEASE_TREATMENT_CLODED_MESSAGE % web.utils.get_now_as_str()
+            message.msg_type = 'S'
+            message.save()
 
 def retry_send(message):
     with transaction.atomic():
