@@ -98,7 +98,11 @@ def treatment_send(message):
     _treatment_send(message, treatment)
 
 def treatment_go(treatment):
-    ChannelGroup("treatment-waiting").send({"text": json.dumps({"action": "go_treating", "treatment": treatment.id})})
+    group = ChannelGroup("treatment-waiting")
+    count = len(group.channel_layer.group_channels('treatment-waiting'))
+    group.send({"text": json.dumps({"action": "go_treating", "treatment": treatment.id})})
+    print("Galerinha on: " + str(count))
+    return count > 0
 
 def _treatment_begin(message, treatment):
     lock_id = "consumers.treatment-begin"
@@ -110,7 +114,6 @@ def _treatment_begin(message, treatment):
         try:
             if treatment is not None and (treatment.is_closed or (treatment.user is not None and treatment.user != message.user)):
                 raise ClientError("TREATMENT_ACCESS_DENIED")
-
 
             try:
                 current_treatment = Treatment.objects.get(user=message.user,is_closed=False)
@@ -125,6 +128,8 @@ def _treatment_begin(message, treatment):
                 treatment.save()
 
             treatment.websocket_group.add(message.reply_channel)
+
+            ChannelGroup("treatment-waiting").discard(message.reply_channel)
 
             message.channel_session['treatments'] = list(set(message.channel_session['treatments']).union([treatment.id]))
             message.reply_channel.send({"text": json.dumps({"action": "treating", "treatment": treatment.id})})

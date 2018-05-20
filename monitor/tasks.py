@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from django.utils import timezone
 from django.db import transaction
-from django.conf import settings
 from django.core.cache import cache
 
 from celery.task import Task
@@ -11,6 +10,8 @@ from celery import Celery
 from celery import shared_task
 from celery.schedules import crontab
 from celery.utils.log import get_task_logger
+
+from constance import config
 
 from datetime import datetime
 
@@ -29,7 +30,7 @@ def send_invites():
     pending_invites = models.Invite.objects.filter(is_sync=False).order_by('-created_at')
 
     for pending_invite in pending_invites:
-        monitor.twitter_api.PostUpdates(status=settings.PLEASE_INVITE_MESSAGE, \
+        monitor.twitter_api.PostUpdates(status=config.PLEASE_INVITE_MESSAGE, \
             in_reply_to_status_id=pending_invite.issue.tweet_id, auto_populate_reply_metadata=True)
         pending_invite.is_sync = True
         pending_invite.sync_at = datetime.now()
@@ -102,7 +103,7 @@ def new_receive_directs():
                 other_id = direct.sender_id
                 direct_type = 'R'
 
-                if settings.TWITTER_OWNER_ID == other_id:
+                if config.TWITTER_OWNER_ID == other_id:
                     other_id = direct.recipient_id
                     direct_type = 'S'
 

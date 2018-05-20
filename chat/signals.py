@@ -9,13 +9,34 @@ from django.dispatch import receiver
 
 from monitor.models import Message, Treatment
 from monitor import apps as monitor
+
 from chat import consumers
 
+from constance import config
+from constance.signals import config_updated
+
 import web.utils
+import datetime
+
+
+@receiver(config_updated)
+def constance_updated(sender, key, old_value, new_value, **kwargs):
+    if key == 'PLEASE_TREATMENT_IS_ACTIVE':
+        if new_value:
+            msg = config.PLEASE_TREATMENT_ACTIVE_TWEET_MESSAGE
+        else:
+            msg = config.PLEASE_TREATMENT_INACTIVE_TWEET_MESSAGE
+
+        msg = msg % web.utils.get_now_as_str()
+
+        monitor.twitter_api.PostUpdates(status=msg)
 
 @receiver(post_save, sender=Message)
 def save_message(sender, instance=None, created=False, **kwargs):
     if created and instance is not None:
+        if hasattr(instance, '_dirty'):
+            return
+
         message = instance
         treatment = message.treatment
 
@@ -24,7 +45,7 @@ def save_message(sender, instance=None, created=False, **kwargs):
 
         last_message = treatment.messages.filter(msg_type='R', is_sync=True).order_by('-created_at').first()
 
-        if treatment.slots_date != last_message.created_at:
+        if last_message is not None and treatment.slots_date != last_message.created_at:
             treatment.slots_date = last_message.created_at
             treatment.slots_count = 5
             treatment.save()
@@ -32,13 +53,42 @@ def save_message(sender, instance=None, created=False, **kwargs):
 @receiver(post_save, sender=Treatment)
 def save_treatment(sender, instance=None, created=False, **kwargs):
     if instance is not None:
+        if hasattr(instance, '_dirty'):
+            return
+
         treatment = instance
 
         if treatment.is_closed:
             json_obj = {"action": "closed"}
             treatment.websocket_group.send({"text": json.dumps(json_obj)})
+            message = Message()
+            message._dirty = True
+            message.treatment = treatment
+            message.created_at = datetime.datetime.now()
+            message.text = config.PLEASE_TREATMENT_CLODED_MESSAGE % web.utils.get_now_as_str()
+            message.msg_type = 'S'
+            message.save()
         elif created:
-            consumers.treatment_go(treatment)
+            if config.PLEASE_TREATMENT_IS_ACTIVE:
+                if not consumers.treatment_go(treatment):
+                    message = Message()
+                    message._dirty = True
+                    message.treatment = treatment
+                    message.created_at = datetime.datetime.now()
+                    message.text = config.PLEASE_TREATMENT_WAITING_MESSAGE % web.utils.get_now_as_str()
+                    message.msg_type = 'S'
+                    message.save()
+            else:
+                message = Message()
+                message._dirty = True
+                message.treatment = treatment
+                message.created_at = datetime.datetime.now()
+                message.text = config.PLEASE_TREATMENT_INACTIVE_MESSAGE % web.utils.get_now_as_str()
+                message.msg_type = 'S'
+                message.save()
+                treatment._dirty = True
+                treatment.is_closed = True
+                treatment.save()
 
 def retry_send(message):
     with transaction.atomic():
@@ -50,6 +100,5 @@ def retry_send(message):
                 message.is_sync = True
                 message.external_id = twitter_msg.id
                 message.save()
-                print("Mensagem local enviada: " + str(message.external_id))
             except Exception as e:
-                print(e)
+                pass
