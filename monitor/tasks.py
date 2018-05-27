@@ -7,7 +7,7 @@ from django.core.cache import cache
 
 from celery.task import Task
 from celery import Celery
-from celery import shared_task
+from celery import shared_task, task
 from celery.schedules import crontab
 from celery.utils.log import get_task_logger
 
@@ -22,6 +22,13 @@ LOCK_EXPIRE = 60 * 5 # Lock expires in 5 minutes
 
 
 @shared_task
+def post_update(msg):
+    from monitor import apps as monitor
+
+    logger.debug("Enviando update...")
+    monitor.twitter_api.PostUpdates(status=msg)
+    logger.debug("...update enviado ;)")
+
 def send_invites():
     from monitor import apps as monitor
     from monitor import models
@@ -38,7 +45,6 @@ def send_invites():
         logger.info("Convite enviado: " + str(pending_invite.id))
     logger.debug("...convites enviados ;)")
 
-@shared_task
 def receive_directs():
     from monitor import apps as monitor
     from monitor import models
@@ -84,7 +90,6 @@ def receive_directs():
     logger.debug("...directs estão sendo recebidos por outra tarefa")
     return
 
-@shared_task
 def new_receive_directs():
     from monitor import apps as monitor
     from monitor import models
@@ -116,7 +121,6 @@ def new_receive_directs():
     logger.debug("...directs estão sendo recebidos por outra tarefa")
     return
 
-@shared_task
 def send_directs():
     from monitor import apps as monitor
     from monitor import models
@@ -179,9 +183,17 @@ def _save_message(direct, user, msg_type):
             person.save()
 
         try:
+            created_at = direct.created_at.replace('+0000 ', '')
+            created_at = timezone.datetime.strptime(created_at, '%a %b %d %H:%M:%S %Y')
+        except Exception as e:
+            logger.error(e)
+            created_at = None
+
+        try:
             treatment = models.Treatment.objects.get(person=person, is_closed=False)
         except Exception as e:
             treatment = models.Treatment()
+            treatment.created_at = created_at
             treatment.person = person
             treatment.save()
 
@@ -191,13 +203,6 @@ def _save_message(direct, user, msg_type):
             message = models.Message()
             message.external_id = direct.id
             message.msg_type = msg_type
-
-        try:
-            created_at = direct.created_at.replace('+0000 ', '')
-            created_at = timezone.datetime.strptime(created_at, '%a %b %d %H:%M:%S %Y')
-        except Exception as e:
-            logger.error(e)
-            created_at = None
 
         message.treatment = treatment
         message.created_at = created_at

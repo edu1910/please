@@ -1,8 +1,20 @@
+#Shellscript
+*.sh
+
+#Vi swap files
+*.swp
+
+#Migrations
+monitor/migrations/*
+chat/migrations/*
+
 #Avatar
 please/web/static/avatar/*
 
 #SQLite
 *.sqlite3
+*.db
+*.rdb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
