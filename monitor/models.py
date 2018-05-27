@@ -129,7 +129,7 @@ class Message(models.Model):
 
     treatment = models.ForeignKey(Treatment, on_delete=models.CASCADE, related_name='messages')
     created_at = models.DateTimeField(default=datetime.datetime.now())
-    external_id = models.CharField(max_length=32)
+    external_id = models.BigIntegerField(blank=True, null=True)
     text = models.TextField()
     is_sync = models.BooleanField(default=False)
     msg_type = models.CharField(max_length=1, choices=TYPE)
