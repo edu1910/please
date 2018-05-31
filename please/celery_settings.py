@@ -17,7 +17,7 @@ app.autodiscover_tasks()
 
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
-    #sender.add_periodic_task(61.0, send_invites.s(), name='send_invites every 61 seconds')
+    sender.add_periodic_task(61.0, send_invites.s(), name='send_invites every 61 seconds')
     sender.add_periodic_task(61.0, receive_directs.s(), name='receive_directs every 61 seconds')
     sender.add_periodic_task(5.0,  send_directs.s(), name='send_directs every 5 seconds')
 

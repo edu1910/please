@@ -64,15 +64,20 @@ def save_message(sender, instance, created=False, **kwargs):
                         message.msg_type = 'S'
                         message.save()
                 else:
+                    last_rejected = treatment.person.treatments.filter(is_rejected=True, is_closed=True, closed_at__isnull=False).order_by('-closed_at').first()
+                    if last_rejected is None or datetime.datetime.now() - last_rejected.closed_at >= datetime.timedelta(minutes=30):
+                        message = Message()
+                        message._dirty = True
+                        message.treatment = treatment
+                        message.created_at = datetime.datetime.now()
+                        message.text = config.PLEASE_TREATMENT_INACTIVE_MESSAGE % web.utils.get_now_as_str()
+                        message.msg_type = 'S'
+                        message.save()
+
                     treatment.is_closed = True
+                    treatment.is_rejected = True
+                    treatment.closed_at = datetime.datetime.now()
                     treatment.save()
-                    message = Message()
-                    message._dirty = True
-                    message.treatment = treatment
-                    message.created_at = datetime.datetime.now()
-                    message.text = config.PLEASE_TREATMENT_INACTIVE_MESSAGE % web.utils.get_now_as_str()
-                    message.msg_type = 'S'
-                    message.save()
 
 @receiver(post_save, sender=Treatment)
 def save_treatment(sender, instance, created=False, **kwargs):
