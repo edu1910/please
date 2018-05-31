@@ -150,6 +150,7 @@ def _treatment_end(message, treatment):
         raise ClientError("TREATMENT_ACCESS_DENIED")
 
     treatment.is_closed = True
+    treatment.closed_at = datetime.now()
     treatment.save()
 
     message = Message()

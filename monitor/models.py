@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
 from django.utils.six import python_2_unicode_compatible
+from django.utils import timezone
 
 from channels import Group as ChannelGroup
 
@@ -99,12 +100,13 @@ class TweetBlackList(models.Model):
 
 @python_2_unicode_compatible
 class Treatment(models.Model):
-    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='treatments')
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-    created_at = models.DateTimeField(default=datetime.datetime.now())
+    created_at = models.DateTimeField(default=timezone.now())
     treatment_at = models.DateTimeField(blank=True, null=True)
     closed_at = models.DateTimeField(blank=True, null=True)
     is_closed = models.BooleanField(default=False)
+    is_rejected = models.BooleanField(default=False)
     slots_date = models.DateTimeField(blank=True, null=True)
     slots_count = models.IntegerField(default=0)
 
@@ -128,7 +130,7 @@ class Message(models.Model):
     )
 
     treatment = models.ForeignKey(Treatment, on_delete=models.CASCADE, related_name='messages')
-    created_at = models.DateTimeField(default=datetime.datetime.now())
+    created_at = models.DateTimeField(default=timezone.now())
     external_id = models.BigIntegerField(blank=True, null=True)
     text = models.TextField()
     is_sync = models.BooleanField(default=False)
@@ -141,7 +143,7 @@ class Message(models.Model):
 class Invite(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     issue = models.OneToOneField(Issue, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(default=datetime.datetime.now())
+    created_at = models.DateTimeField(default=timezone.now())
     is_sync = models.BooleanField(default=False)
     sync_at = models.DateTimeField(blank=True, null=True)
 
