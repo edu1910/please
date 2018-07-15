@@ -17,6 +17,10 @@ $(function () {
     });
 
     options_treatment();
+
+    if (view_treatment_id) {
+        view_treatment(view_treatment_id)
+    }
 });
 
 function stop_treatments() {
@@ -84,6 +88,7 @@ function options_treatment() {
     $('#chat_loading').hide();
     $('#chat_panel').hide();
     $('#chat_footer').hide();
+    $('#chat_missed').hide();
 
     if (is_manager) {
         $('#treatments_card').show();
@@ -115,6 +120,7 @@ function waiting_treatment() {
     $('#chat_loading').show();
     $('#chat_panel').hide();
     $('#chat_footer').hide();
+    $('#chat_missed').hide();
 }
 
 function doing_treatment(data) {
@@ -126,6 +132,7 @@ function doing_treatment(data) {
     $('#chat_loading').hide();
     $('#chat_panel').show();
     $('#chat_footer').show();
+    $('#chat_missed').hide();
 
     treatment = data['treatment'];
 }
@@ -139,6 +146,7 @@ function waiting_following_treatment() {
     $('#chat_loading').show();
     $('#chat_panel').hide();
     $('#chat_footer').hide();
+    $('#chat_missed').hide();
 }
 
 function following_treatment(data) {
@@ -150,6 +158,19 @@ function following_treatment(data) {
     $('#chat_loading').hide();
     $('#chat_panel').hide();
     $('#chat_footer').hide();
+    $('#chat_missed').hide();
+}
+
+function viewing_treatment(data) {
+    $('#chat_volunteer_name').html("");
+    $('#start_card').hide();
+    $('#treatments_card').hide();
+    $('#chat_card').show();
+    $('#chat_closed').hide();
+    $('#chat_loading').hide();
+    $('#chat_panel').hide();
+    $('#chat_footer').hide();
+    $('#chat_missed').show();
 }
 
 function text_treatment(data) {
@@ -192,6 +213,8 @@ function start_treatment() {
             doing_treatment(data);
         } else if (data['action'] == 'go_treating') {
             chat_websocket.send('{"command": "begin", "treatment": '+ data['treatment'] +'}');
+        } else if (data['action'] == 'error') {
+            options_treatment();
         }
     }
 }
@@ -240,6 +263,55 @@ function follow_treatment(id) {
             closed_treatment();
         } else if (data['action'] == 'following') {
             following_treatment(data);
+        } else if (data['action'] == 'error') {
+            options_treatment();
+        }
+    }
+}
+
+function wake_treatment(id) {
+    chat_websocket.send('{"command": "wake", "treatment": '+ id +'}');
+}
+
+function view_treatment(id) {
+    cancel_refresh_treatments();
+    clear_chat();
+
+    waiting_treatment();
+
+    if (chat_websocket) {
+        chat_websocket.close();
+    }
+
+    chat_websocket = new WebSocket(get_websocket_url());
+    chat_websocket.onopen = function() {
+        chat_websocket.send('{"command": "view", "treatment": '+id+'}');
+    }
+
+    chat_websocket.onclose = function() {
+        options_treatment();
+    }
+
+    chat_websocket.onerror = function() {
+        options_treatment();
+    }
+
+    chat_websocket.onmessage = function(message) {
+        var data = JSON.parse(message.data);
+
+        if (data['action'] == 'text') {
+            text_treatment(data);
+        } else if (data['action'] == 'closed') {
+            closed_treatment();
+        } else if (data['action'] == 'viewing') {
+            viewing_treatment(data);
+        } else if (data['action'] == 'treating') {
+            doing_treatment(data);
+        } else if (data['action'] == 'waked') {
+            clear_chat();
+            chat_websocket.send('{"command": "begin", "treatment": '+ id +'}');
+        } else if (data['action'] == 'error') {
+            options_treatment();
         }
     }
 }

@@ -25,16 +25,6 @@ def render(request, context, template):
 
     return HttpResponse(template.render(context, request))
 
-def handler500(request):
-    response = render(request, {}, '500.html')
-    response.status_code = 500
-    return response
-
-def handler404(request):
-    response = render(request, {}, '404.html')
-    response.status_code = 404
-    return response
-
 def user_login(request):
     if request.user.is_authenticated:
         return redirect('/')
@@ -101,6 +91,16 @@ def page_issues(request):
 @permission_required("monitor.offer_treatment")
 def page_treatments(request):
     context = {}
+    context['page'] = 'treatments'
+    _update_context_with_user_info(request.user, context)
+
+    return render(request, context, 'treatments.html')
+
+@login_required
+@permission_required("monitor.offer_treatment")
+def page_treatment(request, treatment_id=None):
+    context = {}
+    context['view_treatment'] = treatment_id
     context['page'] = 'treatments'
     _update_context_with_user_info(request.user, context)
 

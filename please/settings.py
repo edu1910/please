@@ -89,6 +89,17 @@ TEMPLATES = [
 WSGI_APPLICATION = 'please.wsgi.application'
 
 
+# Email
+
+EMAIL_HOST = 'smtpout.secureserver.net'
+EMAIL_HOST_USER = 'contato@redeplis.org'
+EMAIL_HOST_PASSWORD = 
+DEFAULT_FROM_EMAIL = 'contato@redeplis.org'
+SERVER_EMAIL = 'contato@redeplis.org'
+EMAIL_PORT = 80
+EMAIL_USE_TLS = False
+
+
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 

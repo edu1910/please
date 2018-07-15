@@ -74,6 +74,8 @@ def save_message(sender, instance, created=False, **kwargs):
                         message.msg_type = 'S'
                         message.save()
 
+                        tasks.send_email.apply_async(args=[message.treatment.pk])
+
                     treatment.is_closed = True
                     treatment.is_rejected = True
                     treatment.closed_at = datetime.datetime.now()

@@ -21,13 +21,6 @@ from monitor.models import Person, Issue, Track, TweetBlackList, GroupManager, T
 from monitor.controller import list_permissions
 from monitor.permissions import admin_required, manager_required, has_permission_to_group, has_permission_to_user
 
-def render(request, context, template):
-    template = loader.get_template('web/' + template)
-
-    context.update(list_permissions(request.user))
-
-    return HttpResponse(template.render(context, request))
-
 @login_required
 def dashboard(request):
     response_data = {}
