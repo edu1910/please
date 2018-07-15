@@ -47,6 +47,7 @@ def ws_receive(message):
     Channel("treatment.receive").send(payload)
 
 @channel_session_user
+@catch_client_error
 def treatment_wait(message):
     ChannelGroup("treatment-waiting").discard(message.reply_channel)
     ChannelGroup("treatment-waiting").add(message.reply_channel)
@@ -64,11 +65,25 @@ def treatment_wait(message):
             pass
 
 @channel_session_user
+@catch_client_error
+def treatment_view(message):
+    treatment = get_treatment_or_error(message["treatment"], message.user)
+    _treatment_view(message, treatment)
+
+@channel_session_user
+@catch_client_error
+def treatment_wake(message):
+    treatment = get_treatment_or_error(message["treatment"], message.user)
+    _treatment_wake(message, treatment)
+
+@channel_session_user
+@catch_client_error
 def treatment_begin(message):
     treatment = get_treatment_or_error(message["treatment"], message.user)
     _treatment_begin(message, treatment)
 
 @channel_session_user
+@catch_client_error
 def treatment_end(message):
     if int(message['treatment']) not in message.channel_session['treatments']:
         raise ClientError("TREATMENT_ACCESS_DENIED")
@@ -77,12 +92,14 @@ def treatment_end(message):
     _treatment_end(message, treatment)
 
 @channel_session_user
+@catch_client_error
 @manager_required()
 def treatment_follow(message):
     treatment = get_treatment_or_error(message["treatment"], message.user)
     _treatment_follow(message, treatment)
 
 @channel_session_user
+@catch_client_error
 @manager_required()
 def treatment_unfollow(message):
     if int(message['treatment']) not in message.channel_session['treatments']:
@@ -92,6 +109,7 @@ def treatment_unfollow(message):
     _treatment_unfollow(message, treatment)
 
 @channel_session_user
+@catch_client_error
 def treatment_send(message):
     if int(message['treatment']) not in message.channel_session['treatments']:
         raise ClientError("TREATMENT_ACCESS_DENIED")
@@ -103,7 +121,6 @@ def treatment_go(treatment):
     group = ChannelGroup("treatment-waiting")
     count = len(group.channel_layer.group_channels('treatment-waiting'))
     group.send({"text": json.dumps({"action": "go_treating", "treatment": treatment.id})})
-    print("Galerinha on: " + str(count))
     return count > 0
 
 def _treatment_begin(message, treatment):
@@ -162,6 +179,27 @@ def _treatment_end(message, treatment):
 
     treatment.websocket_group.send({"text": json.dumps({"action": "closed"})})
     message.channel_session['treatments'] = list(set(message.channel_session['treatments']).difference([treatment.id]))
+
+def _treatment_view(message, treatment):
+    if not (treatment.is_closed and treatment.user is None):
+        raise ClientError("TREATMENT_ACCESS_DENIED")
+
+    if treatment.id not in message.channel_session['treatments']:
+        treatment.websocket_group.add(message.reply_channel)
+        message.channel_session['treatments'].append(treatment.id)
+
+    message.reply_channel.send({"text": json.dumps({"action": "viewing"})})
+    _send_treatment_messages(message.reply_channel, treatment)
+
+def _treatment_wake(message, treatment):
+    if not (treatment.is_closed and treatment.user is None):
+        raise ClientError("TREATMENT_ACCESS_DENIED")
+
+    treatment.is_closed = False
+    treatment.closed_at = None
+    treatment.save()
+
+    message.reply_channel.send({"text": json.dumps({"action": "waked"})})
 
 def _treatment_follow(message, treatment):
     if treatment.is_closed or treatment.user is None:

@@ -8,9 +8,9 @@ from monitor.models import Treatment
 
 def catch_client_error(func):
     @wraps(func)
-    def inner(message, args, **kwargs):
+    def inner(message, *args, **kwargs):
         try:
-            return func(message, args, **kwargs)
+            return func(message, *args, **kwargs)
         except ClientError as e:
             e.send_to(message.reply_channel)
     return inner

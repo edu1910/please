@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^page/dashboard/$', views.page_dashboard),
     url(r'^page/issues/$', views.page_issues),
     url(r'^page/treatments/$', views.page_treatments),
+    url(r'^page/treatment/(?P<treatment_id>\w+)/$', views.page_treatment),
 
     url(r'^page/admin/groups/$', views.page_admin_groups),
     url(r'^page/admin/settings/$', views.page_admin_settings),

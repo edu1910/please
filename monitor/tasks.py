@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.utils import timezone
 from django.db import transaction
 from django.core.cache import cache
+from django.core.mail import send_mail
 
 from celery.task import Task
 from celery import Celery
@@ -13,7 +14,7 @@ from celery.utils.log import get_task_logger
 
 from constance import config
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 logger = get_task_logger(__name__)
 logger.setLevel(10)
@@ -28,6 +29,16 @@ def post_update(msg):
     logger.debug("Enviando update...")
     monitor.twitter_api.PostUpdates(status=msg)
     logger.debug("...update enviado ;)")
+
+@shared_task
+def send_email(treatment_id):
+    send_mail(
+        'Atendimento',
+        'Existe alguém precisando de atendimento: http://please.redeplis.org/page/treatment/%d' % treatment_id,
+        'contato@redeplis.org',
+        ['contato@redeplis.org'],
+        fail_silently=True,
+    )
 
 def send_invites():
     from monitor import apps as monitor
@@ -173,6 +184,8 @@ def send_directs():
 def _save_message(direct, user, msg_type):
     from monitor import models
 
+    now = datetime.now()
+
     with transaction.atomic():
         try:
             person = models.Person.objects.get(user_id=user.id)
@@ -192,10 +205,16 @@ def _save_message(direct, user, msg_type):
         try:
             treatment = models.Treatment.objects.get(person=person, is_closed=False)
         except Exception as e:
-            treatment = models.Treatment()
-            treatment.created_at = created_at
-            treatment.person = person
-            treatment.save()
+            last_treatment = models.Treatment.objects.filter(person=person).order_by('-closed_at').first()
+
+            if last_treatment is not None and last_treatment.user is None\
+                    and now - last_treatment.closed_at <= timedelta(minutes=30):
+                treatment = last_treatment
+            else:
+                treatment = models.Treatment()
+                treatment.created_at = created_at
+                treatment.person = person
+                treatment.save()
 
         try:
             message = models.Message.objects.get(external_id=direct.id, msg_type=msg_type)
