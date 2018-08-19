@@ -408,6 +408,26 @@ footer ul li a:hover, footer ul li a:focus, footer ul li a:active, footer ul li 
   background-color: #ccd8d6!important;
 }
 
+.bg-volunteers {
+  background: #7b4397;
+  background: -webkit-linear-gradient(to left, #7b4397, #6942b4);
+  background: linear-gradient(to left, #7b4397, #6942b4);
+}
+
+.bg-volunteers {
+  color: #ffffff;
+}
+
+.bg-volunteers ol, .bg-volunteers ul {
+  display: inline-block;
+  text-align:left;
+}
+
+.bg-volunteers li {
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
 .bg-accent {
   background-color: #6942b4!important;
 }
@@ -443,4 +463,8 @@ footer ul li a:hover, footer ul li a:focus, footer ul li a:active, footer ul li 
 .btn-xl {
   font-size: 11px;
   padding: 15px 45px;
+}
+
+.text-disabled {
+  color: #bbb;
 }
