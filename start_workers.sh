@@ -2,7 +2,7 @@
 
 set -e
 
-PROJECT=/home/ubuntu/project/please
+PROJECT=/home/www/please
 LOGFILE=$PROJECT/please.log
 ERRORFILE=$PROJECT/error.log
 
@@ -20,7 +20,7 @@ ADDRESS=127.0.0.1:8000
 
 #GROUP=your_unix_group
 
-source /home/ubuntu/.virtualenvs/please/bin/activate
+source /home/www/.virtualenvs/please/bin/activate
 cd $PROJECT/
 
 exec python manage.py runworker
