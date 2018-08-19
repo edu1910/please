@@ -78,8 +78,8 @@ def run():
                         issue.text = text
                         issue.created_at = created_at
                         issue.status = 'I'
-
                         issue.save()
+                        person.save()
 
                         print("Issue identificada")
                 else:
