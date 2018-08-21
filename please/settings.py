@@ -90,14 +90,15 @@ WSGI_APPLICATION = 'please.wsgi.application'
 
 
 # Email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_HOST = 'smtpout.secureserver.net'
-EMAIL_HOST_USER = 'contato@redeplis.org'
-EMAIL_HOST_PASSWORD = 
-DEFAULT_FROM_EMAIL = 'contato@redeplis.org'
-SERVER_EMAIL = 'contato@redeplis.org'
-EMAIL_PORT = 80
-EMAIL_USE_TLS = False
+#EMAIL_HOST = 'smtpout.secureserver.net'
+#EMAIL_HOST_USER = 'contato@redeplis.org'
+#EMAIL_HOST_PASSWORD = ''
+#DEFAULT_FROM_EMAIL = 'contato@redeplis.org'
+#SERVER_EMAIL = 'contato@redeplis.org'
+#EMAIL_PORT = 80
+#EMAIL_USE_TLS = False
 
 
 # Database
@@ -149,16 +150,37 @@ CONSTANCE_CONFIG = {
     'PLEASE_TREATMENT_CLODED_MESSAGE': ('', 'Mensagem automática de atendimento finalizado', str),
     'PLEASE_TREATMENT_ACTIVE_TWEET_MESSAGE': ('', 'Mensagem de Tweet para atendimento aberto', str),
     'PLEASE_TREATMENT_INACTIVE_TWEET_MESSAGE': ('', 'Mensagem de Tweet para atendimento fechado', str),
+
+    'EMAIL_FROM_ADDRESS': ('', 'E-mail de origem'),
+    'EMAIL_HOST': ('', 'Servidor'),
+    'EMAIL_HOST_USER': ('', 'Usuário'),
+    'EMAIL_HOST_PASSWORD': ('', 'Senha'),
+    'EMAIL_PORT': (0, 'Porta'),
+    'EMAIL_USE_TLS': (False, 'TLS'),
+    'EMAIL_ALERT_SUBJECT': ('', 'Template do assunto do e-mail de alerta'),
+    'EMAIL_NEW_VOLUNTEER_SUBJECT': ('', 'Template do assunto do e-mail de novo voluntário'),
+    'EMAIL_ALERT_BODY': ('', 'Template do conteúdo do e-mail de alerta'),
+    'EMAIL_NEW_VOLUNTEER_BODY': ('', 'Template do conteúdo do e-mail de novo voluntário'),
 }
 
 
 CONSTANCE_CONFIG_FIELDSETS = {
-    'Twitter App': ('TWITTER_CONSUMER_KEY', 'TWITTER_CONSUMER_SECRET', \
-                    'TWITTER_ACCESS_TOKEN_KEY', 'TWITTER_ACCESS_TOKEN_SECRET', \
+    'Twitter App': ('TWITTER_CONSUMER_KEY', 'TWITTER_CONSUMER_SECRET',
+                    'TWITTER_ACCESS_TOKEN_KEY', 'TWITTER_ACCESS_TOKEN_SECRET',
                     'TWITTER_OWNER_ID'),
-    'General': ('PLEASE_TREATMENT_IS_ACTIVE', 'PLEASE_INVITE_MESSAGE', \
+    'General': ('PLEASE_TREATMENT_IS_ACTIVE', 'PLEASE_INVITE_MESSAGE',
                 'PLEASE_TREATMENT_INACTIVE_MESSAGE', 'PLEASE_TREATMENT_WAITING_MESSAGE',
                 'PLEASE_TREATMENT_CLODED_MESSAGE',
                 'PLEASE_TREATMENT_ACTIVE_TWEET_MESSAGE',
                 'PLEASE_TREATMENT_INACTIVE_TWEET_MESSAGE'),
+    'Email': ('EMAIL_FROM_ADDRESS',
+              'EMAIL_HOST',
+              'EMAIL_HOST_USER',
+              'EMAIL_HOST_PASSWORD',
+              'EMAIL_PORT',
+              'EMAIL_USE_TLS',
+              'EMAIL_ALERT_SUBJECT',
+              'EMAIL_NEW_VOLUNTEER_SUBJECT',
+              'EMAIL_ALERT_BODY',
+              'EMAIL_NEW_VOLUNTEER_BODY',),
 }

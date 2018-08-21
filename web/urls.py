@@ -28,4 +28,5 @@ urlpatterns = [
     url(r'^api/admin/group/(?P<group_id>\w+)/$', api.admin_group),
     url(r'^api/user/perfil/$', api.user_perfil),
     url(r'^api/user/pass/$', api.user_pass),
+    url(r'^api/volunteer/new/$', api.volunteer_new),
 ]
