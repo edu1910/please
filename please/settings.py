@@ -93,7 +93,7 @@ WSGI_APPLICATION = 'please.wsgi.application'
 
 EMAIL_HOST = 'smtpout.secureserver.net'
 EMAIL_HOST_USER = 'contato@redeplis.org'
-EMAIL_HOST_PASSWORD = 
+EMAIL_HOST_PASSWORD = ''
 DEFAULT_FROM_EMAIL = 'contato@redeplis.org'
 SERVER_EMAIL = 'contato@redeplis.org'
 EMAIL_PORT = 80
@@ -105,10 +105,21 @@ EMAIL_USE_TLS = False
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'please_prod',
+        'USER': 'please',
+        'PASSWORD': 'please',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
+
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#    }
+#}
 
 
 # Internationalization
