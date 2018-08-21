@@ -172,6 +172,7 @@ CONSTANCE_CONFIG = {
     'EMAIL_NEW_VOLUNTEER_SUBJECT': ('', 'Template do assunto do e-mail de novo voluntário'),
     'EMAIL_ALERT_BODY': ('', 'Template do conteúdo do e-mail de alerta'),
     'EMAIL_NEW_VOLUNTEER_BODY': ('', 'Template do conteúdo do e-mail de novo voluntário'),
+    'EMAIL_ALERT_TO': ('', 'Destinatários do e-mail de alerta'),
 }
 
 
@@ -193,5 +194,6 @@ CONSTANCE_CONFIG_FIELDSETS = {
               'EMAIL_ALERT_SUBJECT',
               'EMAIL_NEW_VOLUNTEER_SUBJECT',
               'EMAIL_ALERT_BODY',
-              'EMAIL_NEW_VOLUNTEER_BODY',),
+              'EMAIL_NEW_VOLUNTEER_BODY',
+              'EMAIL_ALERT_TO',),
 }
