@@ -77,7 +77,7 @@ def save_message(sender, instance, created=False, **kwargs):
                         to_addr = config.EMAIL_ALERT_TO
                         subject = config.EMAIL_ALERT_SUBJECT
                         body = config.EMAIL_ALERT_BODY
-                        body = body.replace('{{TREATMENT}}', treatment.pk)
+                        body = body.replace('{{TREATMENT}}', str(treatment.pk))
 
                         tasks.send_email.apply_async(args=[to_addr, subject, body])
 
