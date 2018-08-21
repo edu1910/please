@@ -5,6 +5,9 @@ from django.utils import timezone
 from django.db import transaction
 from django.core.cache import cache
 from django.core.mail import send_mail
+from django.core.mail.backends.smtp import EmailBackend
+from django.core.mail import EmailMultiAlternatives
+from django.utils.html import strip_tags
 
 from celery.task import Task
 from celery import Celery
@@ -31,14 +34,22 @@ def post_update(msg):
     logger.debug("...update enviado ;)")
 
 @shared_task
-def send_email(treatment_id):
-    send_mail(
-        'Atendimento',
-        'Existe alguém precisando de atendimento: http://please.redeplis.org/page/treatment/%d' % treatment_id,
-        'contato@redeplis.org',
-        ['contato@redeplis.org'],
-        fail_silently=True,
-    )
+def send_email(to_addr, subject, body):
+    logger.debug("Enviando e-mail...")
+
+    body_text = strip_tags(body)
+
+    backend = EmailBackend(host=config.EMAIL_HOST, port=config.EMAIL_PORT,\
+        username=config.EMAIL_HOST_USER, password=config.EMAIL_HOST_PASSWORD,\
+        use_tls=config.EMAIL_USE_TLS, fail_silently=False)
+
+    email = EmailMultiAlternatives(subject=subject, body=body_text,
+        from_email=config.EMAIL_FROM_ADDRESS, to=[to_addr,], connection=backend)
+
+    email.attach_alternative(body, "text/html")
+    email.send()
+
+    logger.debug("...e-mail enviado ;)")
 
 def send_invites():
     from monitor import apps as monitor

@@ -1,7 +1,7 @@
 channels==1.1.8
 django_constance==2.2.0
 Django==2.0.3
-celery==4.1.0
+celery==4.2.1
 django_simple_history==2.0
 pytz==2018.3
 python_twitter==3.4.2

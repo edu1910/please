@@ -20,6 +20,10 @@ import web.utils
 from monitor.models import Person, Issue, Track, TweetBlackList, GroupManager, Treatment, Message, Invite
 from monitor.controller import list_permissions
 from monitor.permissions import admin_required, manager_required, has_permission_to_group, has_permission_to_user
+from monitor import tasks
+
+from constance import config
+
 
 @login_required
 def dashboard(request):
@@ -246,6 +250,33 @@ def user_pass(request):
                 response_data['success'] = True
         except IntegrityError as ie:
             response_data['error_msg'] = "J&aacute; existe um volunt&aacute;rio com este nome."
+
+    return JsonResponse(response_data)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def volunteer_new(request):
+    response_data = {'success': False}
+
+    if 'json_data' in request.POST:
+        request_json = json.loads(request.POST['json_data'])
+
+        male = request_json['male']
+        female = request_json['female']
+        name = request_json['name']
+        email = request_json['email']
+        legalAge = request_json['legalAge']
+
+        if legalAge:
+            to_addr = email
+            subject = config.EMAIL_NEW_VOLUNTEER_SUBJECT
+            body = config.EMAIL_NEW_VOLUNTEER_BODY
+            body = body.replace('{{NAME}}', name)
+            body = body.replace('{{PRONOUN}}', 'Sr.' if male else 'Sra.')
+
+            tasks.send_email.apply_async(args=[to_addr, subject, body])
+
+            response_data['success'] = True
 
     return JsonResponse(response_data)
 

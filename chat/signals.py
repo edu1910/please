@@ -74,7 +74,12 @@ def save_message(sender, instance, created=False, **kwargs):
                         message.msg_type = 'S'
                         message.save()
 
-                        tasks.send_email.apply_async(args=[message.treatment.pk])
+                        to_addr = 'contato@redeplis.org'
+                        subject = config.EMAIL_ALERT_SUBJECT
+                        body = config.EMAIL_ALERT_BODY
+                        body = body.replace('{{TREATMENT}}', treatment_id)
+
+                        tasks.send_email.apply_async(args=[to_addr, subject, body])
 
                     treatment.is_closed = True
                     treatment.is_rejected = True
