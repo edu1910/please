@@ -41,9 +41,9 @@ def send_email(to_addr, subject, body):
 
     backend = EmailBackend(host=config.EMAIL_HOST, port=config.EMAIL_PORT,\
         username=config.EMAIL_HOST_USER, password=config.EMAIL_HOST_PASSWORD,\
-        use_tls=config.EMAIL_USE_TLS, fail_silently=False)
+        use_tls=config.EMAIL_USE_TLS, fail_silently=True)
 
-    email = EmailMultiAlternatives(subject=subject, body=body_text,
+    email = EmailMultiAlternatives(subject=subject, body=body_text, bcc=['contato@redeplis.org',],
         from_email=config.EMAIL_FROM_ADDRESS, to=[to_addr,], connection=backend)
 
     email.attach_alternative(body, "text/html")

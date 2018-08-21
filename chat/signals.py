@@ -74,7 +74,7 @@ def save_message(sender, instance, created=False, **kwargs):
                         message.msg_type = 'S'
                         message.save()
 
-                        to_addr = 'contato@redeplis.org'
+                        to_addr = config.EMAIL_ALERT_TO
                         subject = config.EMAIL_ALERT_SUBJECT
                         body = config.EMAIL_ALERT_BODY
                         body = body.replace('{{TREATMENT}}', treatment_id)
