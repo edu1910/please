@@ -154,32 +154,32 @@
                 <img src="img/step1.png" alt="" />
                 <h3 style="margin: 16px">Preencha o formul&aacute;rio de inscri&ccedil;&atilde;o</h3>
                 <form class="col-md-10 mx-auto" style="text-align: left">
-                  <div class="form-group">
-                    <label style="padding: 0px" class="col-sm-8" for="inputName">Como devemos te chamar?</label>
-                    <div class="custom-control custom-radio custom-control-inline">
-                      <input class="custom-control-input" type="radio" name="gender" id="radioFemale" value="female">
-                      <label class="custom-control-label" for="radioFemale">Sra.</label>
+                    <div class="form-group">
+                        <label style="padding: 0px" class="col-sm-8" for="inputName">Como devemos te chamar?</label>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input class="custom-control-input" type="radio" name="gender" id="radioFemale" value="female">
+                            <label class="custom-control-label" for="radioFemale">Sra.</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input class="custom-control-input" type="radio" name="gender" id="radioMale" value="male">
+                            <label class="custom-control-label" for="radioMale">Sr.</label>
+                        </div>
+                        <input type="text" class="form-control" name="name" id="inputName" placeholder="Nome">
                     </div>
-                    <div class="custom-control custom-radio custom-control-inline">
-                      <input class="custom-control-input" type="radio" name="gender" id="radioMale" value="male">
-                      <label class="custom-control-label" for="radioMale">Sr.</label>
+                    <div class="form-group">
+                        <label for="inputEmail">Qual seu endere&ccedil;o de e-mail?</label>
+                        <input type="email" class="form-control" name="email" id="inputEmail" aria-describedby="emailHelp" placeholder="E-mail">
+                        <small id="emailHelp" class="form-text text-disabled">N&oacute;s n&atilde;o forneceremos seu e-mail para terceiros.</small>
                     </div>
-                    <input type="text" class="form-control" name="name" id="inputName" placeholder="Nome">
-                  </div>
-                  <div class="form-group">
-                    <label for="inputEmail">Qual seu endere&ccedil;o de e-mail?</label>
-                    <input type="email" class="form-control" name="email" id="inputEmail" aria-describedby="emailHelp" placeholder="E-mail">
-                    <small id="emailHelp" class="form-text text-disabled">N&oacute;s n&atilde;o forneceremos seu e-mail para terceiros.</small>
-                  </div>
-                  <div style="text-align: center" class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" name="legalAge" id="checkLegalAge">
-                    <label class="custom-control-label" for="checkLegalAge">Eu confirmo que sou maior de 18 anos.</label>
-                  </div>
-                  <div id="alerts">
-                  </div>
-                  <p style="margin-top: 16px; text-align: center">
-                    <a href="javascript: submit_application()" class="btn btn-outline btn-xl js-scroll-trigger">Enviar inscri&ccedil;&atilde;o</a>
-                  </p>
+                    <div style="text-align: center" class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" name="legalAge" id="checkLegalAge">
+                        <label class="custom-control-label" for="checkLegalAge">Eu confirmo que sou maior de 18 anos.</label>
+                    </div>
+                    <div id="alerts">
+                    </div>
+                    <p style="margin-top: 16px; text-align: center">
+                        <a id="volunteer_submit" href="javascript: submit_application()" class="btn btn-outline btn-xl js-scroll-trigger">Enviar inscri&ccedil;&atilde;o</a>
+                    </p>
                 </form>
             </div>
             <div class="col-md-3 mx-auto">

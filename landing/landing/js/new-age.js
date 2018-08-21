@@ -80,6 +80,43 @@ function submit_application() {
         show_alert("warning", "Desculpe, voc&ecirc; deve possuir ao menos 18 anos de idade para inscrever-se.", 10000);
         return;
     }
+
+    data = {json_data: JSON.stringify({male:isMale, female:isFemale, name:name, email:email, legalAge:isLegalAge})};
+    $('#volunteer_submit').addClass('disabled');
+    $('#volunteer_submit').html('Aguarde...');
+    $("#radioFemale").prop('disabled', true);
+    $("#radioMale").prop('disabled', true);
+    $("#checkLegalAge").prop('disabled', true);
+    $("#inputName").prop('disabled', true);
+    $("#inputEmail").prop('disabled', true);
+
+    $.post(url="https://please.redeplis.org/api/volunteer/new/", data=data)
+    .done(function(data) {
+        console.log("data: " + data)
+        if (data.success) {
+            $("#radioFemale")[0].checked = false;
+            $("#radioMale")[0].checked = false;
+            $("#checkLegalAge")[0].checked = false;
+            $("#inputName")[0].value = '';
+            $("#inputEmail")[0].value = '';
+
+            show_alert("success", "Legal! Confira em sua caixa de e-mail a mensagem que enviamos e confirme sua inscri&ccedil;&atilde;o.", 0);
+        } else {
+            show_alert("danger", "Ops! Estamos com algum problema em nossos servidores. Por favor, envie um e-mail para <a href=\"mailto:contato@redeplis.org\">contato@redeplis.org</a> com as informa&ccedil;&otilde;es da sua inscri&ccedil;&atilde;o.", 0);
+        }
+    })
+    .fail(function() {
+        show_alert("danger", "Ops! Estamos com algum problema em nossos servidores. Por favor, envie um e-mail para <a href=\"mailto:contato@redeplis.org\">contato@redeplis.org</a> com as informa&ccedil;&otilde;es da sua inscri&ccedil;&atilde;o.", 0);
+    })
+    .always(function() {
+        $('#volunteer_submit').removeClass('disabled');
+        $('#volunteer_submit').html('Enviar inscri&ccedil;&atilde;o');
+        $("#radioFemale").prop('disabled', false);
+        $("#radioMale").prop('disabled', false);
+        $("#checkLegalAge").prop('disabled', false);
+        $("#inputName").prop('disabled', false);
+        $("#inputEmail").prop('disabled', false);
+    });
 }
 
 function validateEmail(email) {
@@ -105,8 +142,9 @@ function show_alert(type, message, timeout) {
 
     $("#alerts").html(alert);
 
+    clearTimeout(alert_timeout);
+
     if (timeout > 0) {
-        clearTimeout(alert_timeout);
         alert_timeout = setTimeout(function() {
             $("#" + type + "_alert").alert('close');
         }, timeout);
